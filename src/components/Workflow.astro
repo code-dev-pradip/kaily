@@ -1,0 +1,179 @@
+---
+/**
+ * Workflow.astro
+ * - Uses Lottie JSON from /public/lottie/
+ * - Desktop JSON + Mobile JSON
+ * - Plays when section is visible
+ */
+
+const {
+  pillText = "Custom workflows",
+  title = "Create no-code workflows to\nempower your AI agent",
+  primaryText = "Try for free",
+  primaryHref = "#",
+  sparklePillSrc = "/images/sparkle.svg",
+  sparkleBtnSrc = "/images/sparkle-white.svg",
+
+  // ✅ put these files in /public/lottie/
+  desktopJson = "/lottie/home.json",
+  mobileJson = "/lottie/homemobile.json",
+
+  mobileMaxWidth = 767,
+} = Astro.props;
+
+const titleLines = String(title).split("\n");
+
+// ✅ define a fixed id
+const lottieId = "workflow-lottie";
+---
+
+<section class="w-full py-14 md:py-20">
+  <div class="mx-auto max-w-310 px-4">
+    <div class="mx-auto w-full text-center">
+      <!-- pill -->
+      <div class="mb-2 inline-flex items-center gap-2 lg:mb-2.5">
+        <span
+          class="
+            font-medium
+            text-[18px] leading-[1.33]
+            lg:text-[20px] lg:leading-[1.4]
+            bg-[linear-gradient(90deg,#9276FF_0.02%,#652FFF_99.98%)]
+            bg-clip-text text-transparent
+          "
+        >
+          {pillText}
+        </span>
+
+        <img src={sparklePillSrc} alt="sparkle" loading="lazy" class="h-5 w-5 shrink-0" />
+      </div>
+
+      <!-- heading -->
+      <h2 class="mx-auto mb-10 max-w-4xl whitespace-pre-line text-[34px] font-semibold leading-[1.18] tracking-[-0.02em] text-[#0c0c0c] md:text-[48px]">
+        {titleLines.map((line) => (
+          <>
+            {line}
+            <br />
+          </>
+        ))}
+      </h2>
+
+      <!-- animation -->
+      <div class="mx-auto w-full">
+        <div
+          id={lottieId}
+          class="mx-auto w-full"
+          style="aspect-ratio: 16 / 6;"
+          data-desktop={desktopJson}
+          data-mobile={mobileJson}
+          data-mobile-max={String(mobileMaxWidth)}
+          aria-label="Workflow animation"
+        ></div>
+      </div>
+
+      <!-- CTA -->
+      <div class="mt-10 flex items-center justify-center">
+        <a
+          href={primaryHref}
+          class="cta-primary h-14.5 inline-flex items-center justify-center gap-3 rounded-full px-8 py-3 text-[18px] font-semibold text-white"
+        >
+          <img src={sparkleBtnSrc} alt="" class="h-6 w-6 shrink-0" loading="lazy" />
+          <span>{primaryText}</span>
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .cta-primary {
+    background-image: linear-gradient(90deg, #9276ff, #652fff);
+  }
+  .cta-primary:hover {
+    background-image: linear-gradient(135deg, #652fff, #9276ff);
+  }
+</style>
+
+<script is:inline type="module">
+  import lottie from "https://esm.sh/lottie-web@5.12.2";
+
+  const container = document.getElementById("workflow-lottie");
+  if (!container) {
+    console.error("Workflow: #workflow-lottie not found");
+  }
+
+  const desktopPath = container?.dataset.desktop || "/lottie/home.json";
+  const mobilePath  = container?.dataset.mobile  || "/lottie/homemobile.json";
+  const MOBILE_MAX  = Number(container?.dataset.mobileMax || 767);
+
+  const pickSrc = () => (window.innerWidth <= MOBILE_MAX ? mobilePath : desktopPath);
+
+  let anim = null;
+  let currentSrc = null;
+
+  const destroyAnim = () => {
+    if (!anim) return;
+    try { anim.destroy(); } catch {}
+    anim = null;
+  };
+
+  const load = (src, playAfterLoad) => {
+    if (!container) return;
+    if (currentSrc === src && anim) {
+      if (playAfterLoad) anim.play();
+      return;
+    }
+
+    destroyAnim();
+    currentSrc = src;
+
+    anim = lottie.loadAnimation({
+      container,
+      renderer: "svg",
+      loop: true,
+      autoplay: false,
+      path: src,
+      rendererSettings: { preserveAspectRatio: "xMidYMid meet" },
+    });
+
+    anim.addEventListener("data_failed", () => {
+      console.error("Lottie failed to load JSON:", src);
+    });
+
+    anim.addEventListener("DOMLoaded", () => {
+      if (playAfterLoad) anim.goToAndPlay(0, true);
+    });
+  };
+
+  const section = container?.closest("section");
+
+  // preload (no play)
+  load(pickSrc(), false);
+
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) {
+          if (anim) anim.pause();
+          return;
+        }
+        load(pickSrc(), true);
+      });
+    },
+    { threshold: 0.15, rootMargin: "100px 0px" }
+  );
+
+  if (section) observer.observe(section);
+
+  // swap json on resize (only when visible)
+  let t = null;
+  window.addEventListener("resize", () => {
+    clearTimeout(t);
+    t = setTimeout(() => {
+      if (!section) return;
+      const r = section.getBoundingClientRect();
+      const visible = r.bottom > 0 && r.top < (window.innerHeight || document.documentElement.clientHeight);
+      if (!visible) return;
+      load(pickSrc(), true);
+    }, 150);
+  });
+</script>

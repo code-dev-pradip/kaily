@@ -1,0 +1,118 @@
+---
+/**
+ * Cta.astro
+ * - Desktop: buttons inline
+ * - Mobile/Tablet: buttons stacked
+ * - Secondary button: gradient text + hover bg
+ *
+ * Assets (put in /public/images):
+ * - /images/sparkle.svg
+ * - /images/sparkle-white.svg
+ * - /images/calender.svg
+ */
+
+const {
+  heading = "Kaily can do great things for your business",
+  primaryText = "Try for free",
+  secondaryText = "Talk to an expert",
+  primaryHref = "#",
+  secondaryHref = "#",
+  sparkleSrc = "/images/sparkle-white.svg",
+  expertIconSrc = "/images/calender.svg",
+} = Astro.props;
+---
+
+<section class="w-full The class `bg-[linear-gradient(#fff,_#fbf7ff_20%,_#fbf7ff_80%,_#fff)]` can be written as `bg-[linear-gradient(#fff,#fbf7ff_20%,#fbf7ff_80%,#fff)]` py-14 md:py-20">
+  <div class="mx-auto max-w-300 px-4">
+    <div class="mx-auto max-w-245 text-center">
+
+      <!-- Pill -->
+      <div class="mb-2 inline-flex items-center gap-2 lg:mb-2.5">
+        <span
+          class="
+            font-medium
+            text-[18px] leading-[1.33]
+            lg:text-[20px] lg:leading-[1.4]
+            bg-[linear-gradient(90deg,#9276FF_0.02%,#652FFF_99.98%)]
+            bg-clip-text text-transparent
+          "
+        >
+          Transform your business
+        </span>
+
+        <img
+          src="/images/sparkle.svg"
+          alt="sparkle"
+          loading="lazy"
+          class="h-5 w-5 shrink-0"
+        />
+      </div>
+
+      <!-- Heading -->
+      <h2 class="mx-auto mb-6 max-w-167.5 text-[28px] font-semibold leading-[1.08] tracking-[-0.02em] text-[#0c0c0c] md:text-[48px]">
+        {heading}
+      </h2>
+
+      <!-- Buttons -->
+      <div class="mx-auto flex w-full max-w-190 flex-col items-center justify-center gap-4 md:flex-row md:gap-6">
+
+        <!-- Primary button -->
+        <a
+          href={primaryHref}
+          class="cta-primary h-14.5 inline-flex w-full items-center justify-center gap-3 rounded-full px-6 py-3 text-[18px] font-semibold text-white md:w-auto"
+        >
+          <img
+            src={sparkleSrc}
+            alt=""
+            class="h-6 w-6 shrink-0"
+            loading="lazy"
+          />
+          <span>{primaryText}</span>
+        </a>
+
+        <!-- Secondary button -->
+        <a
+          href={secondaryHref}
+          class="cta-secondary h-14.5 inline-flex w-full items-center justify-center gap-3 rounded-full border border-[#9276FF] px-6 py-3 text-[18px] font-semibold md:w-auto"
+        >
+          <img
+            src={expertIconSrc}
+            alt=""
+            class="h-6 w-6 shrink-0"
+            loading="lazy"
+          />
+          <span class="cta-secondary-text">
+            {secondaryText}
+          </span>
+        </a>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  /* Primary */
+  .cta-primary {
+    background-image: linear-gradient(90deg, #9276ff, #652fff);
+  }
+  .cta-primary:hover {
+    background-image: linear-gradient(135deg, #652fff, #9276ff);
+  }
+
+  /* Secondary */
+  .cta-secondary {
+    background-color: transparent;
+    transition: background-color 200ms ease;
+  }
+  .cta-secondary:hover {
+    background-color: #cc99ff26;
+  }
+
+  .cta-secondary-text {
+    background-image: linear-gradient(90deg, #9276ff, #652fff);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+</style>

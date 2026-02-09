@@ -1,0 +1,62 @@
+---
+export type BentoCard = {
+  id: string;
+  title: string;
+  desktopImg: string;
+  mobileImg: string;
+  alt: string;
+  colSpan?: 1 | 2 | 3 | 4 | 5 | 6;
+};
+
+const { cards = [] } = Astro.props as {
+  cards: BentoCard[];
+};
+
+const colSpanMap: Record<number, string> = {
+  1: "lg:col-span-1",
+  2: "lg:col-span-2",
+  3: "lg:col-span-3",
+  4: "lg:col-span-4",
+  5: "lg:col-span-5",
+  6: "lg:col-span-6",
+};
+---
+
+<div class="w-full">
+  <div class="grid grid-cols-1 gap-7.5 lg:grid-cols-6">
+    {cards.map((card) => (
+      <article
+        class={[
+          "relative overflow-hidden rounded-2xl bg-zinc-100 lg:h-107",
+          colSpanMap[card.colSpan ?? 6],
+        ].join(" ")}
+      >
+        {/* Image */}
+        <picture class="relative w-full lg:absolute lg:inset-0">
+          <source media="(max-width: 1023px)" srcset={card.mobileImg} />
+          <img
+            src={card.desktopImg}
+            alt={card.alt}
+            loading="lazy"
+            class="w-full object-cover lg:h-full"
+          />
+        </picture>
+
+        {/* Title overlay */}
+        <div class="pointer-events-none absolute inset-0">
+          <p
+            class="
+              inline-flex px-10 py-8
+              text-[1.5rem] leading-[1.4]
+              lg:text-[1.75rem] lg:leading-[1.35]
+              font-semibold tracking-[-0.02em]
+              text-[#0c0c0c]
+            "
+          >
+            {card.title}
+          </p>
+        </div>
+      </article>
+    ))}
+  </div>
+</div>

@@ -1,0 +1,467 @@
+---
+/**
+ * Reviews.astro
+ * ✅ Desktop (lg+): 2 vertical infinite marquees (col1 down, col2 up) + CTA inline (only desktop)
+ * ✅ Mobile + Tablet (<lg): only col1, horizontal left marquee infinite + CTA full-width (only mobile+tablet)
+ * ✅ FIX: Mobile/tablet marquee was clipping because container had fixed height + overflow hidden.
+ *        Now: mobile shell height is responsive + cards have clamped text so everything stays visible.
+ */
+
+const {
+  heading = "People who love us",
+  subheading = "Hear what our users say.\nReal experiences, real impact",
+  ctaText = "Testimonials",
+  ctaHref = "#",
+
+  starImg = "/images/Star.svg",
+
+  col1 = [
+    {
+      name: "Will Wei",
+      avatar: "/images/wills.avif",
+      text: "Finally something that doesn't just give generic responses but actually feels like a knowledgeable team member. 🎯 Quick question though - are you planning to add any features that would help with seasonal trend predictions or customer behavior analysis? Would be a game-changer for planning inventory! 🤔",
+      rating: 4,
+    },
+    {
+      name: "Abhay G",
+      avatar: "/images/abhay.avif",
+      text: "Kaily.ai platform excels in enhancing our customer experience through easy to setup generative AI agent. Their recent pricing reduction really help our startup business. Personalized theme matches our brand. datasource sync stand out as major advantages for us to avoid manually updating it as our documentation changes",
+      rating: 5,
+    },
+    {
+      name: "Hitendra Rathore",
+      avatar: "/images/hitender.avif",
+      text: "Amazing AI tool and a must-have on your website",
+      rating: 5,
+    },
+  ],
+
+  col2 = [
+    {
+      name: "Nayan Lathiya",
+      avatar: "/images/nayan.avif",
+      text: "It has made developing, training, and deploying my own AI assistant very easy. The development platform is easy to setup and use. Do give it a try.",
+      rating: 5,
+    },
+    {
+      name: "Tririos",
+      avatar: "/images/trios.avif",
+      text: "Amazing product! Great productivity boost",
+      rating: 4,
+    },
+    {
+      name: "Rajendra P",
+      avatar: "/images/raj.avif",
+      text: "I trained the Kaily on all my FAQs in my hospital website , it seamlessly intrigrataes various data sources to deploy my AI agent. nice options",
+      rating: 5,
+    },
+  ],
+
+  desktopSpeed = 18,
+  mobileSpeed = 18,
+
+  // ✅ how many lines to show on mobile/tablet so cards don't get cut
+  mobileClampLines = 4,
+} = Astro.props;
+
+const subLines = String(subheading).split("\n").filter(Boolean);
+
+const col1Loop = [...col1, ...col1];
+const col2Loop = [...col2, ...col2];
+
+function clampRating(n) {
+  const x = Number(n || 0);
+  return Math.max(0, Math.min(5, x));
+}
+---
+
+<section class="w-full bg-[linear-gradient(#fff,#fbf7ff_20%,#fbf7ff_80%,#fff)]">
+  <div class="mx-auto max-w-320 px-4 py-14 lg:px-0">
+    <div class="grid grid-cols-1 gap-10 lg:grid-cols-[1fr_1.2fr] lg:gap-16">
+      <!-- LEFT -->
+      <div class="flex flex-col justify-center lg:items-start">
+        <h2
+          class="text-[44px] font-semibold leading-[1.05] tracking-[-0.02em] text-[#0C0C0C] lg:text-[54px]"
+        >
+          {heading}
+        </h2>
+
+        <p class="mt-4 text-[18px] font-medium leading-[1.55] text-[#4C4C4C]">
+          {
+            subLines.map((l, i) => (
+              <>
+                {l}
+                {i < subLines.length - 1 ? <br /> : null}
+              </>
+            ))
+          }
+        </p>
+
+        <!-- ✅ CTA (DESKTOP ONLY): inline -->
+        <a
+          href={ctaHref}
+          class="cta-primary mt-10 hidden h-14 items-center justify-center rounded-full px-10 text-[18px] font-semibold lg:inline-flex lg:self-start"
+        >
+          {ctaText}
+        </a>
+      </div>
+
+      <!-- RIGHT -->
+      <div class="relative">
+        {/* ✅ Desktop: 2 vertical marquees */}
+        <div class="hidden lg:grid lg:grid-cols-2 lg:gap-2">
+          <div class="marquee-shell">
+            <div class="marquee-vert down" style={`--dur:${desktopSpeed}s;`}>
+              {
+                col1Loop.map((r) => (
+                  <article class="card">
+                    <div class="card-head">
+                      <img
+                        class="avatar"
+                        src={r.avatar}
+                        alt={r.name}
+                        loading="lazy"
+                      />
+                      <div class="meta">
+                        <div class="name">{r.name}</div>
+                        <div
+                          class="stars"
+                          aria-label={`${clampRating(r.rating)} stars`}
+                        >
+                          {Array.from({ length: clampRating(r.rating) }).map(
+                            () => (
+                              <img
+                                class="star"
+                                src={starImg}
+                                alt=""
+                                aria-hidden="true"
+                                loading="lazy"
+                              />
+                            ),
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                    <p class="text">{r.text}</p>
+                  </article>
+                ))
+              }
+            </div>
+          </div>
+
+          <div class="marquee-shell">
+            <div class="marquee-vert up" style={`--dur:${desktopSpeed}s;`}>
+              {
+                col2Loop.map((r) => (
+                  <article class="card">
+                    <div class="card-head">
+                      <img
+                        class="avatar"
+                        src={r.avatar}
+                        alt={r.name}
+                        loading="lazy"
+                      />
+                      <div class="meta">
+                        <div class="name">{r.name}</div>
+                        <div
+                          class="stars"
+                          aria-label={`${clampRating(r.rating)} stars`}
+                        >
+                          {Array.from({ length: clampRating(r.rating) }).map(
+                            () => (
+                              <img
+                                class="star"
+                                src={starImg}
+                                alt=""
+                                aria-hidden="true"
+                                loading="lazy"
+                              />
+                            ),
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                    <p class="text">{r.text}</p>
+                  </article>
+                ))
+              }
+            </div>
+          </div>
+        </div>
+
+        {/* ✅ Mobile + Tablet (<lg): horizontal marquee + full width CTA */}
+        <div class="lg:hidden">
+          <div class="marquee-shell mobile">
+            <div class="marquee-horz left" style={`--dur:${mobileSpeed}s;`}>
+              {
+                col1Loop.map((r) => (
+                  <article class="card card-mobile">
+                    <div class="card-head">
+                      <img
+                        class="avatar"
+                        src={r.avatar}
+                        alt={r.name}
+                        loading="lazy"
+                      />
+                      <div class="meta">
+                        <div class="name">{r.name}</div>
+                        <div
+                          class="stars"
+                          aria-label={`${clampRating(r.rating)} stars`}
+                        >
+                          {Array.from({ length: clampRating(r.rating) }).map(
+                            () => (
+                              <img
+                                class="star"
+                                src={starImg}
+                                alt=""
+                                aria-hidden="true"
+                                loading="lazy"
+                              />
+                            ),
+                          )}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* ✅ clamp text on mobile/tablet so card stays fully visible */}
+                    <p
+                      class="text text-mobile"
+                      style={`--clamp:${mobileClampLines};`}
+                    >
+                      {r.text}
+                    </p>
+                  </article>
+                ))
+              }
+            </div>
+          </div>
+
+          <!-- ✅ CTA (MOBILE + TABLET): full width -->
+          <div class="mt-10">
+            <a
+              href={ctaHref}
+              class="cta-primary flex h-14 w-full items-center justify-center rounded-full px-6 text-[18px] font-semibold lg:hidden"
+            >
+              {ctaText}
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .cta-primary {
+    background-image: linear-gradient(90deg, #9276ff 0%, #652fff 100%);
+    color: #fff;
+    text-decoration: none;
+    transition:
+      background-image 200ms ease,
+      transform 150ms ease,
+      box-shadow 150ms ease;
+  }
+  .cta-primary:hover {
+    background-image: linear-gradient(135deg, #652fff 0%, #9276ff 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 12px 28px rgba(101, 47, 255, 0.35);
+  }
+
+  /* ---------------- Desktop shell ---------------- */
+  .marquee-shell {
+    position: relative;
+    height: 640px;
+    overflow: hidden;
+    border-radius: 28px;
+  }
+  .marquee-shell::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: linear-gradient(
+      to bottom,
+      rgba(255, 255, 255, 1),
+      rgba(255, 255, 255, 0) 12%,
+      rgba(255, 255, 255, 0) 88%,
+      rgba(255, 255, 255, 1)
+    );
+  }
+
+  /* ---------------- Cards ---------------- */
+  .card {
+    background: #fff;
+    border: 1px solid #cc99ff26;
+    border-radius: 22px;
+    padding: 18px 18px 20px;
+  }
+  .card + .card {
+    margin-top: 18px;
+  }
+
+  .card-head {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    margin-bottom: 10px;
+  }
+  .avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 999px;
+    object-fit: cover;
+    flex: 0 0 auto;
+  }
+  .meta {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .name {
+    font-size: 16px;
+    font-weight: 600;
+    color: #0c0c0c;
+    line-height: 1.2;
+  }
+
+  .stars {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+  }
+  .star {
+    width: 16px;
+    height: 16px;
+    object-fit: contain;
+  }
+
+  .text {
+    font-size: 18px;
+    line-height: 1.55;
+    color: #3f3f3f;
+    font-weight: 500;
+  }
+
+  /* ---------------- Desktop vertical marquee ---------------- */
+  .marquee-vert {
+    position: absolute;
+    left: 0;
+    right: 0;
+    padding: 18px;
+    will-change: transform;
+    animation-duration: var(--dur, 18s);
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+  }
+  .marquee-vert.down {
+    animation-name: scrollDown;
+  }
+  .marquee-vert.up {
+    animation-name: scrollUp;
+  }
+
+  @keyframes scrollDown {
+    0% {
+      transform: translateY(-50%);
+    }
+    100% {
+      transform: translateY(0%);
+    }
+  }
+  @keyframes scrollUp {
+    0% {
+      transform: translateY(0%);
+    }
+    100% {
+      transform: translateY(-50%);
+    }
+  }
+
+  /* ---------------- Mobile + tablet horizontal marquee ---------------- */
+  .marquee-shell.mobile {
+    /* ✅ FIX: let the shell adapt to card height instead of clipping */
+    height: auto;
+    min-height: 280px;
+    overflow: hidden;
+    border-radius: 28px;
+  }
+
+  /* Make sure there is always enough room for the tallest card on tablet */
+  @media (max-width: 1023px) {
+    .marquee-shell.mobile {
+      min-height: 340px;
+    }
+  }
+  @media (max-width: 640px) {
+    .marquee-shell.mobile {
+      min-height: 320px;
+    }
+  }
+
+  .marquee-shell.mobile::after {
+    background: linear-gradient(
+      to right,
+      rgba(255, 255, 255, 1),
+      rgba(255, 255, 255, 0) 10%,
+      rgba(255, 255, 255, 0) 90%,
+      rgba(255, 255, 255, 1)
+    );
+  }
+
+  .marquee-horz {
+    position: relative; /* ✅ was absolute; absolute + fixed height caused clipping */
+    display: flex;
+    gap: 16px;
+    padding: 18px;
+    width: max-content;
+    will-change: transform;
+    animation-duration: var(--dur, 18s);
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+  }
+  .marquee-horz.left {
+    animation-name: scrollLeft;
+  }
+
+  @keyframes scrollLeft {
+    0% {
+      transform: translateX(0%);
+    }
+    100% {
+      transform: translateX(-50%);
+    }
+  }
+
+  .card-mobile {
+    width: 320px;
+    flex: 0 0 auto;
+
+    /* ✅ FIX: keep all cards same visible height-ish so nothing gets cut */
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Tablet slightly wider */
+  @media (min-width: 640px) and (max-width: 1023px) {
+    .card-mobile {
+      width: 360px;
+    }
+  }
+
+  /* ✅ clamp long text only on mobile/tablet */
+  .text-mobile {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: var(--clamp, 4);
+    overflow: hidden;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .marquee-vert,
+    .marquee-horz {
+      animation: none !important;
+      transform: none !important;
+    }
+  }
+</style>

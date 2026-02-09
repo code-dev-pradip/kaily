@@ -1,0 +1,167 @@
+---
+/**
+ * FAQ.astro (Custom Accordion)
+ * - Smooth open/close EVERY time
+ * - Only one open at a time
+ * - Icon is + when closed, X when open (matches design)
+ */
+
+const defaultItems = [
+  {
+    q: "Who is Kaily?",
+    a: "Kaily is a conversational AI agent platform that automates customer support, sales, and marketing tasks across chat, voice, email, and WhatsApp—without code.",
+  },
+  {
+    q: "How does Kaily differ from traditional chatbots?",
+    a: "Kaily is an AI agent, not a chatbot—automating workflows, integrating with CRMs, ecommerce, and Slack for smarter customer engagement.",
+  },
+  {
+    q: "Can Kaily integrate with my existing CRM or OMS?",
+    a: "Yes. Kaily offers native integrations with leading CRMs, order-management systems, ecommerce platforms, and Slack. Custom API hooks let you connect virtually any tool.",
+  },
+  {
+    q: "Is Kaily data-secure and compliant?",
+    a: "Absolutely. Kaily follows enterprise-grade security standards, including SOC 2 Type II certification, GDPR compliance, and end-to-end data encryption.",
+  },
+  {
+    q: "Does Kaily support voice and WhatsApp bots?",
+    a: "Yes. Kaily enables you to deploy AI voice agents for 24×7 call center support and WhatsApp bots for automated messaging, order tracking, and promotions—all from one dashboard.",
+  },
+  {
+    q: "Can human agents take over an AI chat mid-conversation?",
+    a: "Kaily enables seamless human handoff. Agents can jump into live chats or voice calls with full context and conversation history.",
+  },
+  {
+    q: "How fast can I deploy an AI agent on my website?",
+    a: "You can customize and launch Kaily in under 3 minutes! All you need to do is sign up, configure your agent, and choose deployment channels.",
+  },
+  {
+    q: "Can Kaily handle multilingual conversations?",
+    a: "Yes. The platform supports 100+ languages, letting you deliver global support without extra translation tools.",
+  },
+];
+
+const { items = defaultItems } = Astro.props;
+const uid = `faq-${Math.random().toString(16).slice(2)}`;
+---
+
+<div class="w-full">
+  <div class="mx-auto lg:w-4xl px-4">
+    <div class="rounded-3xl bg-white">
+      <div class="divide-y divide-[#EBEBEB] border-y border-[#EBEBEB]">
+        {items.map((it, i) => (
+          <div class="faq-item">
+            <button
+              type="button"
+              class="faq-trigger flex w-full items-center justify-between gap-6 py-6 text-left cursor-pointer"
+              aria-expanded="false"
+              aria-controls={`${uid}-panel-${i}`}
+            >
+              <span class="text-base font-semibold leading-[1.3] text-[#0c0c0c] md:text-[18px]">
+                {it.q}
+              </span>
+
+              {/* Icon wrapper rotates from + to X */}
+              <span class="faq-icon relative h-6 w-6 shrink-0">
+                <span
+                  class="absolute left-1/2 top-1/2 h-[2px] w-4 -translate-x-1/2 -translate-y-1/2 bg-[#0c0c0c]"
+                ></span>
+                <span
+                  class="absolute left-1/2 top-1/2 h-4 w-[2px] -translate-x-1/2 -translate-y-1/2 bg-[#0c0c0c]"
+                ></span>
+              </span>
+            </button>
+
+            <div
+              id={`${uid}-panel-${i}`}
+              class="faq-panel h-0 overflow-hidden"
+              style="height: 0px;"
+            >
+              <div class="pb-3 pr-10">
+                <p class="text-[14px] leading-[1.7] text-[#4c4c4c] md:text-[16px]">
+                  {it.a}
+                </p>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+</div>
+
+<script is:inline>
+  const DURATION = 280;
+  const items = Array.from(document.querySelectorAll(".faq-item"));
+
+  function closeItem(item) {
+    const trigger = item.querySelector(".faq-trigger");
+    const panel = item.querySelector(".faq-panel");
+    if (!trigger || !panel) return;
+
+    item.classList.remove("is-open");
+    trigger.setAttribute("aria-expanded", "false");
+
+    panel.style.transition = `height ${DURATION}ms ease`;
+    panel.style.height = panel.scrollHeight + "px";
+    panel.offsetHeight; // reflow
+    panel.style.height = "0px";
+  }
+
+  function openItem(item) {
+    const trigger = item.querySelector(".faq-trigger");
+    const panel = item.querySelector(".faq-panel");
+    if (!trigger || !panel) return;
+
+    item.classList.add("is-open");
+    trigger.setAttribute("aria-expanded", "true");
+
+    panel.style.transition = "none";
+    panel.style.height = "0px";
+    panel.offsetHeight; // reflow
+
+    const target = panel.scrollHeight;
+    panel.style.transition = `height ${DURATION}ms ease`;
+    panel.style.height = target + "px";
+  }
+
+  function closeAllExcept(active) {
+    items.forEach((it) => {
+      if (it !== active && it.classList.contains("is-open")) closeItem(it);
+    });
+  }
+
+  items.forEach((item) => {
+    const trigger = item.querySelector(".faq-trigger");
+    const panel = item.querySelector(".faq-panel");
+    if (!trigger || !panel) return;
+
+    trigger.addEventListener("click", () => {
+      const isOpen = item.classList.contains("is-open");
+      if (isOpen) return closeItem(item);
+
+      closeAllExcept(item);
+      openItem(item);
+    });
+  });
+
+  window.addEventListener("resize", () => {
+    items.forEach((item) => {
+      if (!item.classList.contains("is-open")) return;
+      const panel = item.querySelector(".faq-panel");
+      if (panel) panel.style.height = panel.scrollHeight + "px";
+    });
+  });
+</script>
+
+<style>
+  /* + to X animation */
+  .faq-icon {
+    transition: transform 200ms ease;
+    transform: rotate(0deg);
+    transform-origin: center;
+  }
+  .faq-item.is-open .faq-icon {
+    transform: rotate(45deg);
+  }
+</style>

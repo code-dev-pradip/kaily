@@ -1,0 +1,178 @@
+---
+/**
+ * YoutubeResponsiveCard.astro
+ * - Desktop: hover to show pause
+ * - Mobile: tap to toggle pause
+ * - True pause/resume (no iframe removal)
+ * - iOS / Safari safe
+ */
+
+export type Props = {
+  desktopVideoId: string;
+  desktopThumb: string;
+
+  mobileVideoId: string;
+  mobileThumb: string;
+
+  roundedClass?: string;
+};
+
+const {
+  desktopVideoId,
+  desktopThumb,
+  mobileVideoId,
+  mobileThumb,
+  roundedClass = "rounded-[2rem]",
+} = Astro.props as Props;
+---
+
+<div class="lg:w-5xl m-auto">
+  <!-- Desktop -->
+  <div class="hidden md:block">
+    <div
+      class={`video-wrapper relative w-full overflow-hidden bg-black ${roundedClass} shadow-[0_-10px_16px_-4px_rgba(0,0,0,0.08),0_12px_16px_-4px_rgba(0,0,0,0.08)]`}
+      style="padding-bottom:56.25%;"
+      data-video-id={desktopVideoId}
+    >
+      <img
+        src={desktopThumb}
+        alt="Video thumbnail"
+        loading="lazy"
+        class={`absolute inset-0 h-full w-full object-cover ${roundedClass}`}
+      />
+
+      <!-- Play -->
+      <div class="play-btn absolute inset-0 z-20 flex items-center justify-center cursor-pointer">
+        <div class="flex items-center justify-center rounded-full bg-white p-6">
+          <img
+            src="https://cdn.prod.website-files.com/6881f4248da03c548282df55/6916ce9b5683c0de41d81896_Play.svg"
+            alt="Play video"
+            class="w-6 h-6"
+          />
+        </div>
+      </div>
+
+      <!-- Pause -->
+      <div class="pause-btn absolute inset-0 z-20 hidden flex items-center justify-center cursor-pointer">
+        <div class="flex items-center justify-center rounded-full bg-black/60 p-6">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="white">
+            <rect x="6" y="4" width="4" height="16"></rect>
+            <rect x="14" y="4" width="4" height="16"></rect>
+          </svg>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mobile -->
+  <div class="md:hidden">
+    <div
+      class={`video-wrapper relative w-full overflow-hidden bg-black ${roundedClass}`}
+      style="padding-bottom:177.78%;"
+      data-video-id={mobileVideoId}
+      data-mobile="true"
+    >
+      <img
+        src={mobileThumb}
+        alt="Video thumbnail"
+        loading="lazy"
+        class={`absolute inset-0 h-full w-full object-cover ${roundedClass}`}
+      />
+
+      <div class="play-btn absolute inset-0 z-20 flex items-center justify-center cursor-pointer">
+        <div class="flex items-center justify-center rounded-full bg-white p-6">
+          <img
+            src="https://cdn.prod.website-files.com/6881f4248da03c548282df55/6916ce9b5683c0de41d81896_Play.svg"
+            alt="Play video"
+            class="w-6 h-6"
+          />
+        </div>
+      </div>
+
+      <div class="pause-btn absolute inset-0 z-20 hidden flex items-center justify-center cursor-pointer">
+        <div class="flex items-center justify-center rounded-full bg-black/60 p-6">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="white">
+            <rect x="6" y="4" width="4" height="16"></rect>
+            <rect x="14" y="4" width="4" height="16"></rect>
+          </svg>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script is:inline>
+  document.querySelectorAll(".video-wrapper").forEach((wrapper) => {
+    const playBtn = wrapper.querySelector(".play-btn");
+    const pauseBtn = wrapper.querySelector(".pause-btn");
+    const videoId = wrapper.getAttribute("data-video-id");
+    const isMobile = wrapper.hasAttribute("data-mobile");
+
+    let iframe = null;
+    let isPlaying = false;
+
+    function post(action) {
+      if (!iframe) return;
+      iframe.contentWindow.postMessage(
+        JSON.stringify({ event: "command", func: action, args: [] }),
+        "*"
+      );
+    }
+
+    function loadAndPlay() {
+      if (!iframe) {
+        iframe = document.createElement("iframe");
+        iframe.src =
+          "https://www.youtube-nocookie.com/embed/" +
+          videoId +
+          "?enablejsapi=1&autoplay=1&playsinline=1";
+        iframe.allow =
+          "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture";
+        iframe.allowFullscreen = true;
+        iframe.className = "absolute inset-0 w-full h-full border-0";
+        wrapper.appendChild(iframe);
+      }
+      isPlaying = true;
+      playBtn.classList.add("hidden");
+      pauseBtn.classList.remove("hidden");
+    }
+
+    function pauseVideo() {
+      post("pauseVideo");
+      isPlaying = false;
+      pauseBtn.classList.remove("hidden");
+    }
+
+    function resumeVideo() {
+      post("playVideo");
+      isPlaying = true;
+      pauseBtn.classList.remove("hidden");
+    }
+
+    playBtn.addEventListener("click", loadAndPlay);
+
+    pauseBtn.addEventListener("click", () => {
+      if (isPlaying) pauseVideo();
+      else resumeVideo();
+    });
+
+    // Desktop hover
+    if (!isMobile) {
+      wrapper.addEventListener("mouseenter", () => {
+        if (iframe) pauseBtn.classList.remove("hidden");
+      });
+
+      wrapper.addEventListener("mouseleave", () => {
+        if (isPlaying) pauseBtn.classList.add("hidden");
+      });
+    }
+
+    // Mobile tap toggle
+    if (isMobile) {
+      wrapper.addEventListener("click", () => {
+        if (!iframe) return;
+        pauseBtn.classList.toggle("hidden");
+      });
+    }
+  });
+</script>

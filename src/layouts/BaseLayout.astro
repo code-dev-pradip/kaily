@@ -13,21 +13,14 @@ import Footer from "../components/Footer.astro";
     <title>Kaily</title>
   </head>
 
-  <body class="min-h-[100dvh] bg-(--background) text-(--foreground)">
+  <body>
     <Navbar />
 
-    <main class="min-h-[100dvh]">
+    <main>
       <slot />
+      {/* Optional area for pages to inject tabs or any section */}
+      <slot name="tabs" />
     </main>
     <Footer />
   </body>
 </html>
-
-<style>
-  html,
-  body {
-    margin: 0;
-    width: 100%;
-    min-height: 100%;
-  }
-</style>

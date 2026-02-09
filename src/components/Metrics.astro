@@ -1,0 +1,108 @@
+---
+/**
+ * Metrics.astro
+ * ✅ Desktop (lg+):
+ *  - Left: Title + Description + 10x below (like screenshot)
+ *  - Right: 4 metrics in a 2x2 grid (85, 1M, 20, 90)
+ * ✅ Tablet/Mobile (<= md):
+ *  - Title + Description
+ *  - Then metrics stacked in this exact order:
+ *    85%, 1M+, 10x, 20%, 90+
+ * ✅ Background image behind the card
+ */
+
+const {
+  title = "Get real business\nwins with Kaily",
+  description = "Drive tangible results right from the first week",
+  bgImage = "/images/metrics.avif",
+  metrics = [
+    { value: "85%", label: "Tasks automated" },
+    { value: "1M+", label: "Concurrent chats managed" },
+    { value: "10x", label: "Faster resolution" },
+    { value: "20%", label: "Increase in CSAT scores" },
+    { value: "90+", label: "Languages supported" },
+  ],
+  leftMetricIndex = 2, // "10x"
+} = Astro.props;
+
+const titleLines = String(title).split("\n");
+const leftMetric = metrics[leftMetricIndex];
+const rightMetrics = metrics.filter((_, i) => i !== leftMetricIndex); // 85,1M,20,90 (same order)
+---
+
+<section
+  class="relative w-full py-12 md:py-16 lg:py-20"
+  style={
+    bgImage
+      ? `background-image:url(${bgImage});background-position:50%;background-repeat:no-repeat;background-size:cover;position:relative;`
+      : undefined
+  }
+>
+  <div class="mx-auto max-w-6xl px-4">
+    <div
+      class="rounded-[28px] bg-white p-6 shadow-[0_1px_2px_rgba(0,0,0,0.06)]
+             md:p-10 lg:rounded-[36px] lg:p-25"
+    >
+      <div class="flex flex-col gap-10 lg:flex-row lg:items-start lg:gap-14">
+        <!-- LEFT -->
+        <div class="w-full lg:max-w-[440px]">
+          <h2 class="text-[28px] font-semibold leading-[1.2] text-[#0c0c0c] lg:text-[48px]">
+            {titleLines.map((line) => (
+              <>
+                {line}
+                <br />
+              </>
+            ))}
+          </h2>
+
+          <p class="mt-2 text-base font-medium leading-[1.4] text-[#4c4c4c] lg:mt-3 lg:text-lg">
+            {description}
+          </p>
+
+          <!-- Desktop-only: 10x below description (like screenshot) -->
+          {leftMetric && (
+            <div class="mt-10 hidden text-center lg:mt-16 lg:block">
+              <div class="text-[48px] font-bold leading-[1] tracking-[-0.02em] text-[#0c0c0c] lg:text-[90px]">
+                {leftMetric.value}
+              </div>
+              <div class="mt-2 text-base font-medium leading-[1.4] text-[#4c4c4c] lg:mt-3 lg:text-lg">
+                {leftMetric.label}
+              </div>
+            </div>
+          )}
+        </div>
+
+        <!-- RIGHT -->
+        <div class="w-full">
+          <!-- ✅ Tablet/Mobile stacked metrics in exact order (85, 1M, 10x, 20, 90) -->
+          <div class="flex flex-col items-center gap-y-10 md:gap-y-16 lg:hidden">
+            {metrics.map((m) => (
+              <div class="text-center">
+                <div class="text-[48px] font-bold leading-[1] tracking-[-0.02em] text-[#0c0c0c] md:text-[48px]">
+                  {m.value}
+                </div>
+                <div class="mt-3 text-[16px] font-medium text-[#4b4b4b] md:text-[18px]">
+                  {m.label}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <!-- ✅ Desktop grid (right side): 85, 1M, 20, 90 -->
+          <div class="hidden lg:grid lg:grid-cols-2 lg:gap-x-12 lg:gap-y-16">
+            {rightMetrics.map((m) => (
+              <div class="text-center">
+                <div class="text-[64px] font-bold leading-[1] tracking-[-0.02em] text-[#0c0c0c] lg:text-[90px]">
+                  {m.value}
+                </div>
+                <div class="mt-3 text-[18px] font-medium text-[#4b4b4b]">
+                  {m.label}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

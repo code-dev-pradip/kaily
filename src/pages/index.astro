@@ -1,11 +1,298 @@
 ---
-import Welcome from '../components/Welcome.astro';
-import Layout from '../layouts/Layout.astro';
+import Layout from "../layouts/Layout.astro";
+import DiscoverTabs from "../components/DiscoverTabs.astro";
+import BentoGrid from "../components/BentoGrid.astro";
+import YoutubeResponsiveCard from "../components/YoutubeResponsiveCard.astro";
+import RolesCards from "../components/RolesCards.astro";
+import BigCards from "../components/BigCards.astro";
+import ComparisonTable from "../components/ComparisonTable.astro";
+import Logos from "../components/Logos.astro";
+import FAQ from "../components/FAQ.astro";
+import Cta from "../components/Cta.astro";
+import Security from "../components/Security.astro";
+import PoweredCta from "../components/PoweredCta.astro";
+import Metrics from "../components/Metrics.astro";
+import Brands from "../components/Brands.astro";
+import Workflow from "../components/Workflow.astro";
+import Hero from "../components/Hero.astro";
+import Reviews from "../components/Reviews.astro";
 
-// Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
-// Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
+const agentBuilderBento = [
+  {
+    id: "voice",
+    title: "Voice call support",
+    desktopImg: "/images/card-1w.avif",
+    mobileImg: "/images/card-1m.avif",
+    alt: "Voice call support",
+    colSpan: 2,
+  },
+  {
+    id: "handover",
+    title: "Human handover",
+    desktopImg: "/images/card-2w.avif",
+    mobileImg: "/images/card-2m.avif",
+    alt: "Human handover",
+    colSpan: 4,
+  },
+  {
+    id: "video",
+    title: "Life-like video calls",
+    desktopImg: "/images/card-3w.avif",
+    mobileImg: "/images/card-3m.avif",
+    alt: "Life-like video calls",
+    colSpan: 3,
+  },
+  {
+    id: "leads",
+    title: "Active lead collection",
+    desktopImg: "/images/card-4w.avif",
+    mobileImg: "/images/card-4m.avif",
+    alt: "Active lead collection",
+    colSpan: 3,
+  },
+];
+
+const roleCards = [
+  {
+    id: "sales",
+    title: "Sales Representative",
+    description: "Books meetings, engages leads and drives sales",
+    imageSrc: "/images/women.avif",
+    imageAlt: "Sales representative shaking hands",
+    iconSrc: "/images/dollar-circle.svg",
+    iconBg: "#EBF1FF",
+  },
+  {
+    id: "support",
+    title: "Support Agent",
+    description: "Provides 24x7 personalized support for every customer",
+    imageSrc: "/images/men.avif",
+    imageAlt: "Support agent wearing headset",
+    iconSrc: "/images/headphone.svg",
+    iconBg: "#F0EBFF",
+  },
+  {
+    id: "marketing",
+    title: "Marketing Agent",
+    description: "Ideates and sets-up full-fledged campaigns",
+    imageSrc: "/images/girl.avif",
+    imageAlt: "Marketing agent at whiteboard",
+    iconSrc: "/images/Graph.svg",
+    iconBg: "#E7FFE5",
+  },
+];
 ---
 
 <Layout>
-	<Welcome />
+  <Hero
+    bgImage="/images/hero-bg.avif"
+    lottieJson="/lottie/hero-chat.json"
+    mobileImageSrc="/images/hero-chat-mobile.avif"
+    badge1Src="/images/badge-product.svg"
+    badge2Src="/images/badge-g2.svg"
+  />
+
+  <Brands />
+
+  <!-- Video -->
+  <section class="w-full py-8 lg:py-16">
+    <div class="mx-auto max-w-310 px-4 lg:px-0">
+      <YoutubeResponsiveCard
+        desktopVideoId="YZ_f7ZXU6rE"
+        desktopThumb="https://cdn.prod.website-files.com/6881f4248da03c548282df55/6916fd9fe4c7038e45899619_Video%20Cover%20(1).avif"
+        mobileVideoId="YZ_f7ZXU6rE"
+        mobileThumb="https://cdn.pixelbin.io/v2/falling-surf-7c8bb8/original/Trends/Category_Kids/Kaily_Marketing_Video_Vertical_Thumbnail.avif"
+      />
+    </div>
+  </section>
+
+  <!-- Dashboard image -->
+  <section class="w-full py-8 lg:py-12">
+    <div class="mx-auto max-w-310 px-4 lg:px-0">
+      <div class="mx-auto mb-6 max-w-3xl text-center lg:mb-12">
+        <h2
+          class="text-[28px] font-semibold leading-[1.2] text-[#0c0c0c] lg:text-[48px]"
+        >
+          Easy to set up, seamless to use, loved by your team
+        </h2>
+      </div>
+
+      <picture class="block w-full">
+        <source media="(max-width: 1023px)" srcset="/images/dashboardm.avif" />
+        <img
+          src="/images/dashboardw.avif"
+          alt="Dashboard"
+          class="h-auto w-full object-cover"
+          loading="lazy"
+        />
+      </picture>
+    </div>
+  </section>
+
+  <!-- Bento -->
+  <section class="w-full py-8 lg:py-18">
+    <div class="mx-auto max-w-310 px-4 lg:px-0">
+      <div class="mx-auto mb-6 text-center lg:mb-12">
+        <div class="mb-2 inline-flex items-center gap-2 lg:mb-2.5">
+          <span
+            class="bg-[linear-gradient(90deg,#9276FF_0.02%,#652FFF_99.98%)] bg-clip-text text-[18px] font-medium leading-[1.33] text-transparent lg:text-[20px] lg:leading-[1.4]"
+          >
+            Key features
+          </span>
+
+          <img
+            loading="lazy"
+            src="/images/sparkle.svg"
+            alt="star"
+            class="h-auto w-6 max-w-6"
+          />
+        </div>
+
+        <h2
+          class="m-auto text-[28px] font-semibold leading-[1.2] text-[#0c0c0c] lg:text-[48px]"
+        >
+          Get more features with Kaily, right out of the box
+        </h2>
+      </div>
+
+      <BentoGrid heading="Capabilities" cards={agentBuilderBento} />
+    </div>
+  </section>
+
+  <!-- Tabs -->
+  <section class="w-full py-8 lg:py-18">
+    <div class="mx-auto max-w-310 px-4 lg:px-0">
+      <div class="mx-auto mb-6 text-center lg:mb-12">
+        <div class="mb-2 inline-flex items-center gap-2 lg:mb-2.5">
+          <span
+            class="bg-[linear-gradient(90deg,#9276FF_0.02%,#652FFF_99.98%)] bg-clip-text text-[18px] font-medium leading-[1.33] text-transparent lg:text-[20px] lg:leading-[1.4]"
+          >
+            Key features
+          </span>
+
+          <img
+            loading="lazy"
+            src="/images/sparkle.svg"
+            alt="star"
+            class="h-auto w-6 max-w-6"
+          />
+        </div>
+
+        <h2
+          class="text-[28px] font-semibold leading-[1.2] text-[#0c0c0c] lg:text-[48px]"
+        >
+          Discover the platform
+        </h2>
+      </div>
+
+      <DiscoverTabs>
+        <div slot="panel-0" class="pt-6">Agent Builder</div>
+        <div slot="panel-1" class="pt-6">Data Sources</div>
+        <div slot="panel-2" class="pt-6">AI Workflows</div>
+        <div slot="panel-3" class="pt-6">Analytics</div>
+      </DiscoverTabs>
+    </div>
+  </section>
+
+  <!-- Roles -->
+  <section class="w-full py-8 lg:py-18">
+    <div class="mx-auto max-w-310 px-4 lg:px-0">
+      <div class="mx-auto mb-6 text-center lg:mb-12">
+        <h2
+          class="text-[28px] font-semibold leading-[1.2] text-[#0c0c0c] lg:text-[48px]"
+        >
+          One agent, many hats, infinite possibilities
+        </h2>
+
+        <p
+          class="mx-auto mt-2 text-base font-medium leading-[1.4] text-[#4c4c4c] lg:mt-3 lg:max-w-3xl lg:text-lg"
+        >
+          Make Kaily your own with specialized templates for every role. Choose
+          a template, tweak it for your brand, and drive results from the get-go
+        </p>
+      </div>
+
+      <RolesCards cards={roleCards} />
+    </div>
+  </section>
+
+  <section class="w-full py-8 lg:py-18">
+    <div class="mx-auto max-w-310 px-4 lg:px-0">
+      <div class="mx-auto mb-6 text-center lg:mb-12">
+        <h2
+          class="text-[28px] font-semibold leading-[1.2] text-[#0c0c0c] lg:text-[48px]"
+        >
+          One agent, many hats, infinite possibilities
+        </h2>
+      </div>
+      <BigCards />
+    </div>
+  </section>
+
+  <section class="w-full py-8 lg:py-18">
+    <div class="mx-auto max-w-310 px-4 lg:px-0">
+      <div class="mx-auto mb-6 text-center lg:mb-12">
+        <h2
+          class="text-[28px] font-semibold leading-[1.2] text-[#0c0c0c] lg:text-[48px]"
+        >
+          Traditional AI chatbots vs Kaily
+        </h2>
+
+        <p
+          class="mx-auto mt-2 text-base font-medium leading-[1.4] text-[#4c4c4c] lg:mt-3 lg:max-w-3xl lg:text-lg"
+        >
+          What makes Kaily better than run-of-the-mill chatbots
+        </p>
+      </div>
+      <ComparisonTable />
+    </div>
+  </section>
+
+  <section class="w-full py-8 lg:py-18">
+    <div class="mx-auto max-w-310 px-4 lg:px-0">
+      <div class="mx-auto mb-6 text-center lg:mb-12">
+        <h2
+          class="text-[28px] font-semibold leading-[1.2] text-[#0c0c0c] lg:text-[48px]"
+        >
+          Traditional AI chatbots vs Kaily
+        </h2>
+
+        <p
+          class="mx-auto mt-2 text-base font-medium leading-[1.4] text-[#4c4c4c] lg:mt-3 lg:max-w-3xl lg:text-lg"
+        >
+          What makes Kaily better than run-of-the-mill chatbots
+        </p>
+      </div>
+      <Logos />
+    </div>
+  </section>
+
+  <Workflow />
+  <Security />
+  <PoweredCta imageSrc="/images/ai-providers.avif" />
+  <Metrics bgImage="/images/metrics.avif" />
+  <Reviews />
+
+  <section class="w-full py-8 lg:py-18">
+    <div class="mx-auto max-w-310 px-4 lg:px-0">
+      <div class="mx-auto mb-6 text-center lg:mb-12">
+        <h2
+          class="text-[28px] font-semibold leading-[1.2] text-[#0c0c0c] lg:text-[48px]"
+        >
+          Frequently Asked Questions
+        </h2>
+
+        <p
+          class="mx-auto mt-2 text-base font-medium leading-[1.4] text-[#4c4c4c] lg:mt-3 lg:max-w-3xl lg:text-lg"
+        >
+          You can reach out to us for queries via support@kaily.ai or to share
+          feedback, contact us
+        </p>
+      </div>
+
+      <FAQ />
+    </div>
+  </section>
+
+  <Cta />
 </Layout>

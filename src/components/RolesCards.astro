@@ -1,0 +1,56 @@
+---
+export type RolesCard = {
+  id: string;
+  title: string;
+  description: string;
+  imageSrc: string;
+  imageAlt: string;
+  iconSrc: string;
+
+  // Use a real color value so Tailwind doesn't purge it
+  // Example: "#EBF1FF"
+  iconBg?: string;
+};
+
+const { cards = [] } = Astro.props as { cards: RolesCard[] };
+---
+
+<div class="w-full">
+  <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
+    {cards.map((card) => (
+      <div class="relative overflow-hidden rounded-3xl">
+        {/* IMAGE (static) */}
+        <img
+          src={card.imageSrc}
+          alt={card.imageAlt}
+          loading="lazy"
+          class="block w-full object-cover h-86 md:h-86 lg:h-115.75"
+        />
+
+
+        {/* CONTENT */}
+        <div class="absolute inset-x-0 bottom-0 z-10 p-6 lg:p-8">
+          {/* Icon */}
+          <div class="mb-3">
+            <div
+              class="flex h-10 w-10 items-center justify-center rounded-xl"
+              style={`background:${card.iconBg ?? "rgba(255,255,255,0.9)"}`}
+            >
+              <img src={card.iconSrc} alt="" class="h-6 w-6" loading="lazy" />
+            </div>
+          </div>
+
+          {/* Title (TEXT, not heading) */}
+          <p class="font-semibold text-[14px] leading-normal text-[#ffffffe6] lg:text-[20px] lg:leading-[1.4] lg:text-white">
+            {card.title}
+          </p>
+
+          {/* Description */}
+          <p class="mt-1 max-w-[320px] text-[13px] leading-normal text-[#ffffffe6] lg:text-[16px] lg:leading-normal lg:text-white/80">
+            {card.description}
+          </p>
+        </div>
+      </div>
+    ))}
+  </div>
+</div>

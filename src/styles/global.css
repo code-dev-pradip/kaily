@@ -1,0 +1,67 @@
+/* Google Font */
+@import url("https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&display=swap");
+
+/* Tailwind v4 */
+@import "tailwindcss";
+
+/* CSS variables */
+:root {
+  --background: #ffffff;
+  --foreground: #0c0c0c;
+  --navbar-height: 72px;
+  --heading: #0c0c0c;
+
+  color-scheme: light dark;
+}
+
+
+h1, h2, h3, h4, h5, h6 {
+  color: var(--heading);
+}
+
+
+/* Ensure the header uses the variable height */
+header[data-navbar] {
+  height: var(--navbar-height);
+  display: flex;           /* keep your layout */
+  align-items: center;     /* vertical centering */
+ 
+}
+
+/* Push page content down so it isn't hidden under the fixed navbar */
+main,
+.page-content, /* in case you use a wrapper class */
+.layout-root {
+  padding-top: var(--navbar-height);
+}
+
+/* Mobile: if you want smaller navbar on small screens */
+@media (max-width: 767px) {
+  :root { --navbar-height: 64px; }
+}
+
+/* Ensure mobile overlay is above the fixed navbar */
+[data-mobile-overlay] {
+  z-index: 50; /* should be >= header z-index + 1; your markup already uses z-50 */
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+/* Base styles */
+html,
+body {
+  min-height: 100%;
+}
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  font-family: "Manrope", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}

@@ -1,0 +1,291 @@
+---
+/**
+ * DiscoverTabs.astro (Astro + Tailwind)
+ * - 4 tabs with per-tab active color
+ * - Each tab button has its own SVG icon (as requested)
+ * - Progress line animates for active tab (4.8s)
+ * - ✅ Each tab panel is UNIQUE (different SVG/text/image per panel)
+ *
+ * NOTE:
+ * - Keep TAB BUTTON SVGs exactly as you have.
+ * - For panels: you can replace SVG/text/image URLs per tab easily.
+ */
+
+const TABS = [
+  { id: "tab-1", label: "Agent Builder", color: "#7F00FF" },
+  { id: "tab-2", label: "Data Sources", color: "#FF8F13" },
+  { id: "tab-3", label: "AI Workflows", color: "#2034FB" },
+  { id: "tab-4", label: "Analytics", color: "#25B309" },
+];
+
+const initialActive = 0; // 0..3
+---
+
+<!-- WRAPPER ADDED AROUND YOUR EXISTING MARKUP (no other changes to tabs/buttons/js) -->
+<div class="discover-tabs-wrapper">
+  <div class="w-full max-w-310 mx-auto" data-autotabs data-initial-active={initialActive}>
+    <div class="flex flex-col-reverse md:flex-col lg:items-center">
+
+      <!-- Tabs -->
+      <div
+        class="w-full max-w-4xl flex items-center justify-evenly mt-4 mb-0 md:mt-0 md:mb-8 border-b border-neutral-200"
+        role="tablist"
+        aria-label="Discover tabs"
+      >
+        {TABS.map((t, i) => (
+          <button
+            type="button"
+            class="w-full group relative flex items-center justify-center gap-2 px-2 py-2 text-sm font-medium rounded-md outline-none transition-colors"
+            role="tab"
+            aria-selected={i === initialActive ? "true" : "false"}
+            aria-controls={`${t.id}-panel`}
+            id={`${t.id}-btn`}
+            data-tab-btn
+            data-index={i}
+            data-color={t.color}
+            style={i === initialActive ? `color:${t.color}` : "color:#525252"}
+          >
+            <!-- Icon (each tab has a different SVG) -->
+            <span class="h-5 w-5 shrink-0 flex items-center justify-center">
+              {i === 0 && (
+                <svg width="20" height="18" viewBox="0 0 20 18" fill="none" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5">
+                  <path opacity="0.4" d="M18.1917 6.34974H13.575C13.2583 6.34974 13 6.09141 13 5.76641C13 5.44974 13.2583 5.19141 13.575 5.19141H18.1917C18.5083 5.19141 18.7667 5.44974 18.7667 5.76641C18.7667 6.09141 18.5083 6.34974 18.1917 6.34974Z" fill="currentColor"/>
+                  <path opacity="0.4" d="M5.8834 6.34922H2.8084C2.49173 6.34922 2.2334 6.09089 2.2334 5.77422C2.2334 5.45755 2.49173 5.19922 2.8084 5.19922H5.8834C6.20007 5.19922 6.4584 5.45755 6.4584 5.77422C6.4584 6.09089 6.20007 6.34922 5.8834 6.34922Z" fill="currentColor"/>
+                  <path d="M8.95856 9.03333C10.7627 9.03333 12.2252 7.5708 12.2252 5.76667C12.2252 3.96254 10.7627 2.5 8.95856 2.5C7.15443 2.5 5.69189 3.96254 5.69189 5.76667C5.69189 7.5708 7.15443 9.03333 8.95856 9.03333Z" fill="currentColor"/>
+                  <path opacity="0.4" d="M18.1915 14.8102H15.1165C14.7998 14.8102 14.5415 14.5518 14.5415 14.2352C14.5415 13.9185 14.7998 13.6602 15.1165 13.6602H18.1915C18.5082 13.6602 18.7665 13.9185 18.7665 14.2352C18.7665 14.5518 18.5082 14.8102 18.1915 14.8102Z" fill="currentColor"/>
+                  <path opacity="0.4" d="M7.42507 14.8102H2.8084C2.49173 14.8102 2.2334 14.5518 2.2334 14.2352C2.2334 13.9185 2.49173 13.6602 2.8084 13.6602H7.42507C7.74173 13.6602 8.00007 13.9185 8.00007 14.2352C8.00007 14.5518 7.74173 14.8102 7.42507 14.8102Z" fill="currentColor"/>
+                  <path d="M12.0416 17.4982C13.8457 17.4982 15.3082 16.0356 15.3082 14.2315C15.3082 12.4274 13.8457 10.9648 12.0416 10.9648C10.2374 10.9648 8.7749 12.4274 8.7749 14.2315C8.7749 16.0356 10.2374 17.4982 12.0416 17.4982Z" fill="currentColor"/>
+                </svg>
+              )}
+              {i === 1 && (
+                <svg width="20" height="19" viewBox="0 0 20 19" fill="none" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5">
+                  <path opacity="0.4" d="M13.4915 2.40234H6.51647C3.48314 2.40234 1.6748 4.21068 1.6748 7.24401V14.219C1.6748 17.2523 3.48314 19.0607 6.51647 19.0607H13.4915C16.5248 19.0607 18.3331 17.2523 18.3331 14.219V7.24401C18.3331 4.21068 16.5248 2.40234 13.4915 2.40234Z" fill="currentColor"/>
+                  <path d="M5 8.23307C4.65833 8.23307 4.375 7.94974 4.375 7.60807V5.94141C4.375 5.59974 4.65833 5.31641 5 5.31641C5.34167 5.31641 5.625 5.59974 5.625 5.94141V7.60807C5.625 7.94974 5.34167 8.23307 5 8.23307Z" fill="currentColor"/>
+                  <path d="M8.3335 8.23307C7.99183 8.23307 7.7085 7.94974 7.7085 7.60807V5.94141C7.7085 5.59974 7.99183 5.31641 8.3335 5.31641C8.67516 5.31641 8.9585 5.59974 8.9585 5.94141V7.60807C8.9585 7.94974 8.67516 8.23307 8.3335 8.23307Z" fill="currentColor"/>
+                  <path d="M5 16.3581C4.65833 16.3581 4.375 16.0747 4.375 15.7331V14.0664C4.375 13.7247 4.65833 13.4414 5 13.4414C5.34167 13.4414 5.625 13.7247 5.625 14.0664V15.7331C5.625 16.0747 5.34167 16.3581 5 16.3581Z" fill="currentColor"/>
+                  <path d="M8.3335 16.3581C7.99183 16.3581 7.7085 16.0747 7.7085 15.7331V14.0664C7.7085 13.7247 7.99183 13.4414 8.3335 13.4414C8.67516 13.4414 8.9585 13.7247 8.9585 14.0664V15.7331C8.9585 16.0747 8.67516 16.3581 8.3335 16.3581Z" fill="currentColor"/>
+                  <path d="M14.9998 7.40234H11.6665C11.3248 7.40234 11.0415 7.11901 11.0415 6.77734C11.0415 6.43568 11.3248 6.15234 11.6665 6.15234H14.9998C15.3415 6.15234 15.6248 6.43568 15.6248 6.77734C15.6248 7.11901 15.3415 7.40234 14.9998 7.40234Z" fill="currentColor"/>
+                  <path d="M14.9998 15.5273H11.6665C11.3248 15.5273 11.0415 15.244 11.0415 14.9023C11.0415 14.5607 11.3248 14.2773 11.6665 14.2773H14.9998C15.3415 14.2773 15.6248 14.5607 15.6248 14.9023C15.6248 15.244 15.3415 15.5273 14.9998 15.5273Z" fill="currentColor"/>
+                  <path d="M18.3332 10.1094H1.6665V11.3594H18.3332V10.1094Z" fill="currentColor"/>
+                </svg>
+              )}
+              {i === 2 && (
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 21 21" fill="none" class="h-5 w-5">
+                  <path d="M16.7505 6.51276L15.5088 7.75443L13.0088 5.25443L14.2505 4.01276C14.6005 3.66276 15.0505 3.49609 15.5005 3.49609C15.9505 3.49609 16.4005 3.66276 16.7505 4.01276C17.4421 4.70443 17.4421 5.82109 16.7505 6.51276Z" fill="currentColor"/>
+                  <path opacity="0.4" d="M15.5079 7.75586L5.91621 17.3475C5.22454 18.0392 4.10788 18.0392 3.41621 17.3475C2.72454 16.6559 2.72454 15.5392 3.41621 14.8475L13.0079 5.25586L15.5079 7.75586Z" fill="currentColor"/>
+                  <path d="M8.79176 3.18011L9.13343 2.02178C9.16676 1.91344 9.13343 1.79678 9.05843 1.71344C8.98343 1.63011 8.8501 1.59678 8.74176 1.63011L7.58343 1.97178L6.4251 1.63011C6.31676 1.59678 6.2001 1.63011 6.11676 1.70511C6.03343 1.78844 6.00843 1.90511 6.04176 2.01344L6.3751 3.18011L6.03343 4.33844C6.0001 4.44678 6.03343 4.56344 6.10843 4.64678C6.19176 4.73011 6.30843 4.75511 6.41676 4.72178L7.58343 4.38844L8.74176 4.73011C8.7751 4.73844 8.8001 4.74678 8.83343 4.74678C8.91676 4.74678 8.99176 4.71344 9.05843 4.65511C9.14176 4.57178 9.16676 4.45511 9.13343 4.34678L8.79176 3.18011Z" fill="currentColor"/>
+                  <path d="M5.45875 8.18011L5.80042 7.02177C5.83375 6.91344 5.80042 6.79678 5.72542 6.71344C5.64209 6.63011 5.52542 6.60511 5.41709 6.63844L4.25042 6.97178L3.09209 6.63011C2.98375 6.59678 2.86709 6.63011 2.78375 6.70511C2.70042 6.78844 2.67542 6.90511 2.70875 7.01344L3.04209 8.18011L2.70042 9.33844C2.66709 9.44678 2.70042 9.56344 2.77542 9.64678C2.85875 9.73011 2.97542 9.75511 3.08375 9.72178L4.24209 9.38011L5.40042 9.72178C5.42542 9.73011 5.45875 9.73011 5.49209 9.73011C5.57542 9.73011 5.65042 9.69678 5.71709 9.63844C5.80042 9.55511 5.82542 9.43844 5.79209 9.33011L5.45875 8.18011Z" fill="currentColor"/>
+                  <path d="M17.9581 12.347L18.2998 11.1886C18.3331 11.0803 18.2998 10.9636 18.2248 10.8803C18.1414 10.797 18.0248 10.772 17.9164 10.8053L16.7581 11.147L15.5998 10.8053C15.4914 10.772 15.3748 10.8053 15.2914 10.8803C15.2081 10.9636 15.1831 11.0803 15.2164 11.1886L15.5581 12.347L15.2164 13.5053C15.1831 13.6136 15.2164 13.7303 15.2914 13.8136C15.3748 13.897 15.4914 13.922 15.5998 13.8886L16.7581 13.547L17.9164 13.8886C17.9414 13.897 17.9748 13.897 18.0081 13.897C18.0914 13.897 18.1664 13.8636 18.2331 13.8053C18.3164 13.722 18.3414 13.6053 18.3081 13.497L17.9581 12.347Z" fill="currentColor"/>
+                </svg>
+              )}
+              {i === 3 && (
+                <svg width="20" height="19" viewBox="0 0 20 19" fill="none" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5">
+                  <path d="M18.0585 5.79248C17.5251 3.98415 16.0168 2.47582 14.2085 1.94248C12.8335 1.54248 11.8835 1.57582 11.2251 2.06748C10.4335 2.65915 10.3418 3.72582 10.3418 4.48415V6.55915C10.3418 8.60915 11.2751 9.65082 13.1085 9.65082H15.5001C16.2501 9.65082 17.3251 9.55915 17.9168 8.76748C18.4251 8.11748 18.4668 7.16748 18.0585 5.79248Z" fill="currentColor"/>
+                  <path opacity="0.4" d="M15.7585 11.133C15.5418 10.883 15.2252 10.7413 14.9002 10.7413H11.9168C10.4502 10.7413 9.25849 9.54964 9.25849 8.08297V5.09964C9.25849 4.77464 9.11683 4.45797 8.86683 4.2413C8.62516 4.02464 8.29183 3.92464 7.97516 3.9663C6.01683 4.2163 4.21683 5.2913 3.04183 6.90797C1.85849 8.53297 1.42516 10.5163 1.80016 12.4996C2.34183 15.3663 4.63349 17.658 7.50849 18.1996C7.96683 18.2913 8.42516 18.333 8.88349 18.333C10.3918 18.333 11.8502 17.8663 13.0918 16.958C14.7085 15.783 15.7835 13.983 16.0335 12.0246C16.0752 11.6996 15.9752 11.3746 15.7585 11.133Z" fill="currentColor"/>
+                </svg>
+              )}
+            </span>
+
+            <!-- Label -->
+            <span class="hidden md:block">{t.label}</span>
+
+            <!-- Progress line -->
+            <span class="absolute left-0 right-0 -bottom-px h-0.5">
+              <span class="block h-full w-0" data-progress></span>
+            </span>
+          </button>
+        ))}
+      </div>
+
+      <!-- PANELS (UNIQUE PER TAB) -->
+      <div class="pt-0 w-full min-w-0" data-panels>
+
+        <!-- TAB 1 -->
+        <section
+          id="tab-1-panel"
+          role="tabpanel"
+          aria-labelledby="tab-1-btn"
+          class="hidden w-full min-w-0"
+          data-tab-panel
+          data-index="0"
+        >
+          <div
+            class="flex w-full min-w-0 flex-col justify-between rounded-3xl bg-[#f1efff] gap-6
+                   p-0 pt-6 pb-6 pl-6
+                   md:pt-20 md:pb-21 md:pl-16
+                   md:flex-row md:items-center"
+          >
+            <div class="flex flex-col gap-6 max-w-md">
+              <div class="flex h-14 w-14 items-center justify-center rounded-xl bg-[#f1efff]">
+                <!-- SVG (preserved exactly) -->
+                <svg width="56" height="57" viewBox="0 0 56 57" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M0 12.8789C0 6.25149 5.37258 0.878906 12 0.878906H44C50.6274 0.878906 56 6.25149 56 12.8789V44.8789C56 51.5063 50.6274 56.8789 44 56.8789H12C5.37258 56.8789 0 51.5063 0 44.8789V12.8789Z" fill="#F0E1FF"/>
+                  <path opacity="0.4" d="M40.3067 23.0408H32.92C32.4133 23.0408 32 22.6275 32 22.1075C32 21.6008 32.4133 21.1875 32.92 21.1875H40.3067C40.8133 21.1875 41.2267 21.6008 41.2267 22.1075C41.2267 22.6275 40.8133 23.0408 40.3067 23.0408Z" fill="#7F00FF"/>
+                  <path opacity="0.4" d="M20.6134 23.0392H15.6934C15.1868 23.0392 14.7734 22.6259 14.7734 22.1192C14.7734 21.6126 15.1868 21.1992 15.6934 21.1992H20.6134C21.1201 21.1992 21.5334 21.6126 21.5334 22.1192C21.5334 22.6259 21.1201 23.0392 20.6134 23.0392Z" fill="#7F00FF"/>
+                  <path d="M25.5333 27.3322C28.4199 27.3322 30.76 24.9922 30.76 22.1056C30.76 19.219 28.4199 16.8789 25.5333 16.8789C22.6467 16.8789 20.3066 19.219 20.3066 22.1056C20.3066 24.9922 22.6467 27.3322 25.5333 27.3322Z" fill="#7F00FF"/>
+                  <path opacity="0.4" d="M40.3066 36.5705H35.3866C34.8799 36.5705 34.4666 36.1571 34.4666 35.6505C34.4666 35.1438 34.8799 34.7305 35.3866 34.7305H40.3066C40.8132 34.7305 41.2266 35.1438 41.2266 35.6505C41.2266 36.1571 40.8132 36.5705 40.3066 36.5705Z" fill="#7F00FF"/>
+                  <path opacity="0.4" d="M23.0801 36.5705H15.6934C15.1868 36.5705 14.7734 36.1571 14.7734 35.6505C14.7734 35.1438 15.1868 34.7305 15.6934 34.7305H23.0801C23.5868 34.7305 24.0001 35.1438 24.0001 35.6505C24.0001 36.1571 23.5868 36.5705 23.0801 36.5705Z" fill="#7F00FF"/>
+                  <path d="M30.4667 40.8791C33.3533 40.8791 35.6933 38.5391 35.6933 35.6524C35.6933 32.7658 33.3533 30.4258 30.4667 30.4258C27.58 30.4258 25.24 32.7658 25.24 35.6524C25.24 38.5391 27.58 40.8791 30.4667 40.8791Z" fill="#7F00FF"/>
+                </svg>
+              </div>
+
+              <div class="flex flex-col gap-2">
+                <h3 class="text-[20px] lg:text-[28px] font-semibold text-neutral-900 leading-[1.2]">
+                  Agent Builder
+                </h3>
+                <p class="text-[16px] lg:text-[18px] font-medium text-neutral-600">
+                  Build AI agents that speak your brand language and think like your best employee
+                </p>
+              </div>
+            </div>
+
+            <div class="w-full md:w-169.5">
+              <img
+                src="/images/tab-1.avif"
+                alt="Kaily dashboard"
+                loading="lazy"
+                class="h-full w-full rounded-xl object-cover"
+              />
+            </div>
+          </div>
+        </section>
+
+        <!-- TAB 2 (change these to your own SVG/text/image) -->
+        <section id="tab-2-panel" role="tabpanel" aria-labelledby="tab-2-btn" class="hidden w-full min-w-0" data-tab-panel data-index="1">
+          <div class="flex w-full min-w-0 flex-col justify-between rounded-3xl bg-[#fff8f0] gap-6 p-0 pt-6 pb-6 pl-6 md:pt-20 md:pb-21 md:pl-16 md:flex-row md:items-center">
+            <div class="flex flex-col gap-6 max-w-md">
+              <div class="flex h-14 w-14 items-center justify-center rounded-xl bg-[#fff8f0]">
+                <!-- REPLACE WITH TAB-2 SVG -->
+                <svg width="100%" height="100%" viewBox="0 0 56 57" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M0 12.6309C0 6.00344 5.37258 0.630859 12 0.630859H44C50.6274 0.630859 56 6.00344 56 12.6309V44.6309C56 51.2583 50.6274 56.6309 44 56.6309H12C5.37258 56.6309 0 51.2583 0 44.6309V12.6309Z" fill="#FFE7CD"></path>
+<path opacity="0.4" d="M33.5863 15.0332H22.4264C17.573 15.0332 14.6797 17.9265 14.6797 22.7799V33.9399C14.6797 38.7932 17.573 41.6865 22.4264 41.6865H33.5863C38.4397 41.6865 41.333 38.7932 41.333 33.9399V22.7799C41.333 17.9265 38.4397 15.0332 33.5863 15.0332Z" fill="#FF8F13"></path>
+<path d="M20 24.3678C19.4533 24.3678 19 23.9145 19 23.3678V20.7012C19 20.1545 19.4533 19.7012 20 19.7012C20.5467 19.7012 21 20.1545 21 20.7012V23.3678C21 23.9145 20.5467 24.3678 20 24.3678Z" fill="#FF8F13"></path>
+<path d="M25.333 24.3678C24.7863 24.3678 24.333 23.9145 24.333 23.3678V20.7012C24.333 20.1545 24.7863 19.7012 25.333 19.7012C25.8797 19.7012 26.333 20.1545 26.333 20.7012V23.3678C26.333 23.9145 25.8797 24.3678 25.333 24.3678Z" fill="#FF8F13"></path>
+<path d="M20 37.3678C19.4533 37.3678 19 36.9145 19 36.3678V33.7012C19 33.1545 19.4533 32.7012 20 32.7012C20.5467 32.7012 21 33.1545 21 33.7012V36.3678C21 36.9145 20.5467 37.3678 20 37.3678Z" fill="#FF8F13"></path>
+<path d="M25.333 37.3678C24.7863 37.3678 24.333 36.9145 24.333 36.3678V33.7012C24.333 33.1545 24.7863 32.7012 25.333 32.7012C25.8797 32.7012 26.333 33.1545 26.333 33.7012V36.3678C26.333 36.9145 25.8797 37.3678 25.333 37.3678Z" fill="#FF8F13"></path>
+<path d="M36.0003 23.0332H30.667C30.1203 23.0332 29.667 22.5799 29.667 22.0332C29.667 21.4865 30.1203 21.0332 30.667 21.0332H36.0003C36.547 21.0332 37.0003 21.4865 37.0003 22.0332C37.0003 22.5799 36.547 23.0332 36.0003 23.0332Z" fill="#FF8F13"></path>
+<path d="M36.0003 36.0332H30.667C30.1203 36.0332 29.667 35.5799 29.667 35.0332C29.667 34.4865 30.1203 34.0332 30.667 34.0332H36.0003C36.547 34.0332 37.0003 34.4865 37.0003 35.0332C37.0003 35.5799 36.547 36.0332 36.0003 36.0332Z" fill="#FF8F13"></path>
+<path d="M41.3337 27.3672H14.667V29.3672H41.3337V27.3672Z" fill="#FF8F13"></path>
+</svg>
+              </div>
+              <div class="flex flex-col gap-2">
+                <h3 class="text-[20px] lg:text-[28px] font-semibold text-neutral-900 leading-[1.2]">Data Sources</h3>
+                <p class="text-[16px] lg:text-[18px] font-medium text-neutral-600">Connect with your real-time data to get fresh and accurate answers</p>
+              </div>
+            </div>
+            <div class="w-full md:w-169.5">
+              <img src="/images/tab-2.avif" alt="Data sources" loading="lazy" class="h-full w-full rounded-xl object-cover" />
+            </div>
+          </div>
+        </section>
+
+        <!-- TAB 3 -->
+        <section id="tab-3-panel" role="tabpanel" aria-labelledby="tab-3-btn" class="hidden w-full min-w-0" data-tab-panel data-index="2">
+          <div class="flex w-full min-w-0 flex-col justify-between rounded-3xl bg-[#eef5fe] gap-6 p-0 pt-6 pb-6 pl-6 md:pt-20 md:pb-21 md:pl-16 md:flex-row md:items-center">
+            <div class="flex flex-col gap-6 max-w-md">
+              <div class="flex h-14 w-14 items-center justify-center rounded-xl bg-[#F0E1FF]">
+                <!-- REPLACE WITH TAB-3 SVG -->
+                                <svg width="100%" height="100%" viewBox="0 0 56 57" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M0 12.3867C0 5.7593 5.37258 0.386719 12 0.386719H44C50.6274 0.386719 56 5.7593 56 12.3867V44.3867C56 51.0141 50.6274 56.3867 44 56.3867H12C5.37258 56.3867 0 51.0141 0 44.3867V12.3867Z" fill="#D3E1FC"></path>
+                <path d="M38 22.3853L36.0133 24.3719L32.0133 20.3719L34 18.3853C34.56 17.8253 35.28 17.5586 36 17.5586C36.72 17.5586 37.44 17.8253 38 18.3853C39.1066 19.4919 39.1066 21.2786 38 22.3853Z" fill="#2034FB"></path>
+                <path opacity="0.4" d="M36.0133 24.375L20.6667 39.7217C19.56 40.8283 17.7733 40.8283 16.6667 39.7217C15.56 38.615 15.56 36.8283 16.6667 35.7217L32.0133 20.375L36.0133 24.375Z" fill="#2034FB"></path>
+                <path d="M25.2666 17.0515L25.8133 15.1981C25.8666 15.0248 25.8133 14.8381 25.6933 14.7048C25.5733 14.5715 25.36 14.5181 25.1866 14.5715L23.3333 15.1181L21.48 14.5715C21.3066 14.5181 21.12 14.5715 20.9866 14.6915C20.8533 14.8248 20.8133 15.0115 20.8666 15.1848L21.4 17.0515L20.8533 18.9048C20.8 19.0781 20.8533 19.2648 20.9733 19.3981C21.1066 19.5315 21.2933 19.5715 21.4666 19.5181L23.3333 18.9848L25.1866 19.5315C25.24 19.5448 25.28 19.5581 25.3333 19.5581C25.4666 19.5581 25.5866 19.5048 25.6933 19.4115C25.8266 19.2781 25.8666 19.0915 25.8133 18.9181L25.2666 17.0515Z" fill="#2034FB"></path>
+                <path d="M19.9333 25.0515L20.48 23.1981C20.5333 23.0248 20.48 22.8381 20.36 22.7048C20.2267 22.5715 20.04 22.5315 19.8667 22.5848L18 23.1181L16.1467 22.5715C15.9733 22.5181 15.7867 22.5715 15.6533 22.6915C15.52 22.8248 15.48 23.0115 15.5333 23.1848L16.0667 25.0515L15.52 26.9048C15.4667 27.0781 15.52 27.2648 15.64 27.3981C15.7733 27.5315 15.96 27.5715 16.1333 27.5181L17.9867 26.9715L19.84 27.5181C19.88 27.5315 19.9333 27.5315 19.9867 27.5315C20.12 27.5315 20.24 27.4781 20.3467 27.3848C20.48 27.2515 20.52 27.0648 20.4667 26.8915L19.9333 25.0515Z" fill="#2034FB"></path>
+                <path d="M39.9333 31.72L40.48 29.8667C40.5333 29.6933 40.48 29.5067 40.36 29.3733C40.2267 29.24 40.04 29.2 39.8667 29.2533L38.0133 29.8L36.16 29.2533C35.9867 29.2 35.8 29.2533 35.6667 29.3733C35.5333 29.5067 35.4933 29.6933 35.5467 29.8667L36.0933 31.72L35.5467 33.5733C35.4933 33.7467 35.5467 33.9333 35.6667 34.0667C35.8 34.2 35.9867 34.24 36.16 34.1867L38.0133 33.64L39.8667 34.1867C39.9067 34.2 39.96 34.2 40.0133 34.2C40.1467 34.2 40.2667 34.1467 40.3733 34.0533C40.5067 33.92 40.5467 33.7333 40.4933 33.56L39.9333 31.72Z" fill="#2034FB"></path>
+                </svg>
+              </div>
+              <div class="flex flex-col gap-2">
+                <h3 class="text-[20px] lg:text-[28px] font-semibold text-neutral-900 leading-[1.2]">AI Workflows</h3>
+                <p class="text-[16px] lg:text-[18px] font-medium text-neutral-600">Trigger real actions with simple, no-code workflows</p>
+              </div>
+            </div>
+            <div class="w-full md:w-169.5">
+              <img src="/images/tab-3.avif" alt="AI workflows" loading="lazy" class="h-full w-full rounded-xl object-cover" />
+            </div>
+          </div>
+        </section>
+
+        <!-- TAB 4 -->
+        <section id="tab-4-panel" role="tabpanel" aria-labelledby="tab-4-btn" class="hidden w-full min-w-0" data-tab-panel data-index="3">
+          <div class="flex w-full min-w-0 flex-col justify-between rounded-3xl bg-[#eeffea] gap-6 p-0 pt-6 pb-6 pl-6 md:pt-20 md:pb-21 md:pl-16 md:flex-row md:items-center">
+            <div class="flex flex-col gap-6 max-w-md">
+              <div class="flex h-14 w-14 items-center justify-center rounded-xl bg-[#eeffea]">
+                 <!-- REPLACE WITH TAB-4 SVG -->
+                  <svg width="100%" height="100%" viewBox="0 0 56 57" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M0 12.1406C0 5.51321 5.37258 0.140625 12 0.140625H44C50.6274 0.140625 56 5.51321 56 12.1406V44.1406C56 50.768 50.6274 56.1406 44 56.1406H12C5.37258 56.1406 0 50.768 0 44.1406V12.1406Z" fill="#D6FACF"></path>
+                  <path d="M40.8934 21.4078C40.04 18.5145 37.6267 16.1011 34.7334 15.2478C32.5334 14.6078 31.0134 14.6611 29.96 15.4478C28.6934 16.3945 28.5467 18.1011 28.5467 19.3145V22.6345C28.5467 25.9145 30.04 27.5811 32.9734 27.5811H36.8C38 27.5811 39.72 27.4345 40.6667 26.1678C41.48 25.1278 41.5467 23.6078 40.8934 21.4078Z" fill="#25B309"></path>
+                  <path opacity="0.4" d="M37.2134 29.9542C36.8667 29.5542 36.36 29.3275 35.84 29.3275H31.0667C28.72 29.3275 26.8134 27.4208 26.8134 25.0742V20.3008C26.8134 19.7808 26.5867 19.2742 26.1867 18.9275C25.8 18.5808 25.2667 18.4208 24.76 18.4875C21.6267 18.8875 18.7467 20.6075 16.8667 23.1942C14.9734 25.7942 14.28 28.9675 14.88 32.1408C15.7467 36.7275 19.4134 40.3942 24.0134 41.2608C24.7467 41.4075 25.48 41.4742 26.2134 41.4742C28.6267 41.4742 30.96 40.7275 32.9467 39.2742C35.5334 37.3942 37.2534 34.5142 37.6534 31.3808C37.72 30.8608 37.56 30.3408 37.2134 29.9542Z" fill="#25B309"></path>
+                  </svg>
+              </div>
+              <div class="flex flex-col gap-2">
+                <h3 class="text-[20px] lg:text-[28px] font-semibold text-neutral-900 leading-[1.2]">Analytics</h3>
+                <p class="text-[16px] lg:text-[18px] font-medium text-neutral-600">Track resolution time, CSAT, and support wins all from a single dashboard</p>
+              </div>
+            </div>
+            <div class="w-full md:w-169.5">
+              <img src="/images/tab-4.avif" alt="Analytics" loading="lazy" class="h-full w-full rounded-xl object-cover" />
+            </div>
+          </div>
+        </section>
+
+      </div>
+    </div>
+  </div>
+</div>
+<!-- END WRAPPER -->
+
+<script is:inline>
+  const root = document.currentScript?.previousElementSibling;
+  if (!root) throw new Error("DiscoverTabs: root not found");
+
+  const buttons = [...root.querySelectorAll("[data-tab-btn]")];
+  const panels = [...root.querySelectorAll("[data-tab-panel]")];
+  const DURATION_MS = 4800;
+
+  function setActive(index) {
+    buttons.forEach((btn, i) => {
+      const isActive = i === index;
+      btn.setAttribute("aria-selected", isActive ? "true" : "false");
+      const color = btn.getAttribute("data-color") || "#111827";
+      btn.style.color = isActive ? color : "#525252";
+
+      const bar = btn.querySelector("[data-progress]");
+      if (bar) {
+        bar.style.backgroundColor = isActive ? color : "transparent";
+        bar.style.width = "0%";
+        bar.style.transition = "none";
+        void bar.offsetWidth;
+        if (isActive) {
+          bar.style.transition = `width ${DURATION_MS}ms linear`;
+          bar.style.width = "100%";
+        }
+      }
+    });
+
+    panels.forEach((p, i) => {
+      p.classList.toggle("hidden", i !== index);
+      p.classList.toggle("block", i === index);
+    });
+  }
+
+  const initialAttr = Number(root.getAttribute("data-initial-active"));
+  setActive(!Number.isNaN(initialAttr) && initialAttr >= 0 ? initialAttr : 3);
+
+  buttons.forEach((btn) => {
+    btn.addEventListener("click", () => {
+      setActive(Number(btn.getAttribute("data-index") || 0));
+    });
+
+    btn.addEventListener("keydown", (e) => {
+      if (e.key !== "ArrowLeft" && e.key !== "ArrowRight") return;
+      e.preventDefault();
+      const current = Number(btn.getAttribute("data-index") || 0);
+      const next =
+        e.key === "ArrowRight"
+          ? (current + 1) % buttons.length
+          : (current - 1 + buttons.length) % buttons.length;
+      buttons[next].focus();
+      setActive(next);
+    });
+  });
+</script>

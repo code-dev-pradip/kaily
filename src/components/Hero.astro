@@ -1,0 +1,476 @@
+---
+/**
+ * Hero.astro (FULL)
+ * ✅ Desktop (lg >= 1024): bg image + 3 dotlottie players (1 per tab), auto-rotate, clickable
+ * ✅ Mobile + Tablet (< 1024): ONLY static images (mobileMediaImages), no bg, no lottie
+ * ✅ Tabs scroll on mobile, desktop tabs flex
+ * ✅ Badges: show full suffix only on desktop (lg)
+ */
+
+const {
+  // top badges
+  badge1Icon = "/images/producthunt.svg",
+  badge1Number = "#3",
+  badge1Suffix = "Product of the day",
+
+  badge2Icon = "/images/ga2.svg",
+  badge2Number = "4.8",
+  badge2Suffix = "Rated 4.8 out of 5 on G2",
+
+  title = "The AI agent that\ngoes beyond the\nchatbox",
+  description = "Meet Kaily, the AI agent that gets real work done. It sells, resolves, and automates daily tasks in a flash",
+
+  // buttons (desktop only)
+  primaryText = "Try for free",
+  primaryHref = "#",
+  primarySparkle = "/images/sparkle-white.svg",
+
+  secondaryText = "Watch Video",
+  secondaryHref = "#",
+  secondaryIcon = "/images/Vector.svg",
+
+  // tabs
+  tabs = [
+    { label: "Your best sales agent" },
+    { label: "Your team’s support hero" },
+    { label: "A smart workflow wizard" },
+  ],
+
+  // desktop backgrounds (behind media for each tab) - desktop only
+  mediaBgs = [
+    "/images/tabhero1.avif",
+    "/images/tabhero2.avif",
+    "/images/tabhero3.avif",
+  ],
+
+  // desktop lotties (one per tab)
+  lottiePaths = [
+    "/lottie/chat1.lottie",
+    "/lottie/chat2.lottie",
+    "/lottie/chat3.lottie",
+  ],
+
+  // ✅ mobile/tablet static images (used for BOTH mobile + tablet)
+  mobileMediaImages = [
+    "/images/state1.avif",
+    "/images/state2.avif",
+    "/images/state3.avif",
+  ],
+
+  // channel icons row (desktop only)
+  channelsTitle = "Deploy your AI agents seamlessly",
+  channels = [
+    { icon: "/images/whatsapp.svg", label: "WhatsApp" },
+    { icon: "/images/chat.svg", label: "Chat" },
+    { icon: "/images/app.svg", label: "App" },
+    { icon: "/images/voice.svg", label: "Voice" },
+    { icon: "/images/web.svg", label: "Website" },
+  ],
+
+  // ✅ IMPORTANT: treat tablet like mobile (up to 1023px)
+  mobileMaxWidth = 1023,
+
+  // initial active tab
+  defaultActive = 0,
+
+  // auto-rotate timing
+  autoRotateMs = 8000,
+} = Astro.props;
+
+const titleLines = String(title).split("\n");
+---
+
+<section class="w-full bg-white">
+  <div class="mx-auto max-w-320 px-4 py-10 md:py-14 lg:px-0">
+    <div class="flex flex-col gap-10 md:gap-12 lg:flex-row lg:items-center lg:justify-between lg:gap-16">
+      <!-- LEFT -->
+      <div class="w-full lg:w-[35%] text-center md:text-left">
+        <!-- badges -->
+        <div class="mb-6 flex flex-wrap items-center gap-3 justify-center md:justify-start">
+          <div class="inline-flex items-center gap-2 rounded-full border border-[#ECECEC] bg-white px-3 py-2">
+            <img src={badge1Icon} alt="" class="h-5 w-5" loading="lazy" />
+            <span class="text-[12px] font-semibold text-[#3B3B3B]">
+              <span>{badge1Number}</span>
+              <span class="hidden lg:inline"> {badge1Suffix}</span>
+            </span>
+          </div>
+
+          <div class="inline-flex items-center gap-2 rounded-full border border-[#ECECEC] bg-white px-3 py-2">
+            <img src={badge2Icon} alt="" class="h-5 w-5" loading="lazy" />
+            <span class="text-[12px] font-semibold text-[#3B3B3B]">
+              <span>{badge2Number}</span>
+              <span class="hidden lg:inline"> {badge2Suffix}</span>
+            </span>
+          </div>
+        </div>
+
+        <!-- heading -->
+        <h1 class="text-[40px] font-semibold leading-[1.05] tracking-[-0.02em] text-[#0C0C0C] md:text-[44px] lg:text-[54px]">
+          {titleLines.map((line) => (<><span>{line}</span><br /></>))}
+        </h1>
+
+        <p class="mt-4 max-w-130 text-[18px] font-medium leading-[1.55] text-[#4C4C4C]">
+          {description}
+        </p>
+
+        <!-- buttons (desktop only) -->
+        <div class="mt-8 hidden lg:flex lg:items-center lg:gap-4">
+          <a
+            href={primaryHref}
+            class="inline-flex h-[56px] w-[220px] items-center justify-center gap-3 rounded-full px-6 text-[18px] font-semibold text-white
+                   bg-[linear-gradient(90deg,#9276FF,#652FFF)] hover:bg-[linear-gradient(135deg,#652FFF,#9276FF)] transition"
+          >
+            <img src={primarySparkle} alt="" class="h-[22px] w-[22px]" loading="lazy" />
+            <span>{primaryText}</span>
+          </a>
+
+          <a
+            href={secondaryHref}
+            class="inline-flex h-[56px] w-[220px] items-center justify-center gap-3 rounded-full border border-[#E7D9FF]
+                   bg-[#F5EFFF] px-6 text-[18px] font-semibold text-[#652FFF]"
+          >
+            <img src={secondaryIcon} alt="" class="h-[22px] w-[22px]" loading="lazy" />
+            <span>{secondaryText}</span>
+          </a>
+        </div>
+
+        <!-- channels (desktop only) -->
+        <div class="mt-10 hidden lg:block">
+          <div class="mb-3 text-[16px] font-semibold text-[#4C4C4C]">{channelsTitle}</div>
+
+          <div class="relative flex items-center">
+            {channels.map((c, idx) => (
+              <button
+                class="group relative inline-flex h-12 w-12 items-center justify-center rounded-full border border-[#E9E9E9] bg-white"
+                style={`z-index:${10 + idx}; margin-left:${idx === 0 ? "0px" : "-14px"};`}
+                type="button"
+                aria-label={c.label}
+              >
+                <img src={c.icon} alt={c.label} loading="lazy" class="h-[24px] w-[24px]" />
+
+                <span
+                  class="pointer-events-none absolute left-1/2 top-[calc(100%+12px)] z-50 -translate-x-1/2 whitespace-nowrap
+                         rounded-xl border border-[#ECECEC] bg-white px-3 py-2 text-[14px] font-semibold text-[#1B1B1B]
+                         opacity-0 shadow-[0_10px_30px_rgba(0,0,0,0.10)] transition
+                         group-hover:opacity-100 group-focus-visible:opacity-100"
+                >
+                  {c.label}
+                </span>
+
+                <span
+                  class="pointer-events-none absolute left-1/2 top-[calc(100%+6px)] z-[49] h-3 w-3 -translate-x-1/2 rotate-45
+                         border-l border-t border-[#ECECEC] bg-white opacity-0 transition
+                         group-hover:opacity-100 group-focus-visible:opacity-100"
+                />
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT -->
+      <div class="w-full lg:w-[66%]">
+        <div
+          class="relative w-full overflow-hidden rounded-[28px] bg-[#F6F6F6] lg:h-167"
+          data-hero
+          data-mobile-max={String(mobileMaxWidth)}
+          data-default-active={String(defaultActive)}
+          data-bgs={JSON.stringify(mediaBgs)}
+          data-lotties={JSON.stringify(lottiePaths)}
+          data-mobile-images={JSON.stringify(mobileMediaImages)}
+          data-rotate-ms={String(autoRotateMs)}
+        >
+          <div
+            class="pointer-events-none absolute inset-0 bg-cover bg-center bg-no-repeat [transform:scale(1.01)] media-bg"
+            aria-hidden="true"
+          />
+
+          <!-- desktop lotties -->
+          <div class="pointer-events-none relative hidden h-full w-full items-center justify-center p-6 lg:flex lottie-stack">
+            <div class="lottie-item absolute right-10 bottom-[80px] hidden w-60 h-100 items-center justify-center" data-lottie="0"></div>
+            <div class="lottie-item absolute right-10 bottom-[80px] hidden w-60 h-100 items-center justify-center" data-lottie="1"></div>
+            <div class="lottie-item absolute right-10 bottom-[80px] hidden w-60 h-100 items-center justify-center" data-lottie="2"></div>
+          </div>
+
+          <!-- mobile/tablet static -->
+          <div class="pointer-events-none relative flex w-full lg:hidden">
+            <img class="h-full w-full object-cover mobile-media-img" src={mobileMediaImages[0]} alt="" loading="lazy" />
+          </div>
+
+          <!-- tabs -->
+          <div class="absolute bottom-4 left-4 right-4 z-10 flex gap-3 lg:justify-between" role="tablist" aria-label="Hero tabs">
+            {tabs.map((t, i) => (
+              <button
+                type="button"
+                class="tab-pill relative min-w-full overflow-hidden rounded-full border border-white/50 bg-black/35 px-3 py-2
+                       backdrop-blur-[10px] transition lg:min-w-[0] lg:flex-1"
+                data-tab={String(i)}
+                role="tab"
+                aria-selected={i === defaultActive ? "true" : "false"}
+              >
+                <span class="tab-fill absolute inset-0 w-0 transition-[width] duration-500" aria-hidden="true" />
+
+                <span class="relative z-10 inline-flex items-center gap-2 whitespace-nowrap text-[16px] font-medium">
+                  <!-- ✅ CHECK (inactive = white, active = green) -->
+                  <span class="tab-check relative inline-flex h-[20px] w-[20px] items-center justify-center rounded-full">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="1.666 1.666 16.666 16.666"
+                      class="absolute inset-0 m-auto h-full w-full"
+                      aria-hidden="true"
+                    >
+                      <path
+                        d="M10.4718 1.66602C5.88009 1.66602 2.13843 5.40768 2.13843 9.99935C2.13843 14.591 5.88009 18.3327 10.4718 18.3327C15.0634 18.3327 18.8051 14.591 18.8051 9.99935C18.8051 5.40768 15.0634 1.66602 10.4718 1.66602ZM14.4551 8.08268L9.73009 12.8077C9.61343 12.9243 9.45509 12.991 9.28843 12.991C9.12176 12.991 8.96343 12.9243 8.84676 12.8077L6.48843 10.4493C6.24676 10.2077 6.24676 9.80768 6.48843 9.56602C6.73009 9.32435 7.13009 9.32435 7.37176 9.56602L9.28843 11.4827L13.5718 7.19935C13.8134 6.95768 14.2134 6.95768 14.4551 7.19935C14.6968 7.44102 14.6968 7.83268 14.4551 8.08268Z"
+                        fill="currentColor"
+                      />
+                    </svg>
+                  </span>
+
+                  <span class="tab-label">{t.label}</span>
+                </span>
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .lottie-item {
+    border-radius: 26.857px;
+    border: 1.119px solid #fff;
+    background: rgba(255, 255, 255, 0.54);
+    box-shadow: 0 4.476px 35.921px 0 rgba(0, 0, 0, 0.12);
+    backdrop-filter: blur(22.212892532348633px);
+  }
+  .lottie-item dotlottie-player {
+    width: 100%;
+    height: 100%;
+  }
+  .lottie-item.is-active {
+    display: flex !important;
+  }
+
+  @media (max-width: 1023px) {
+    .media-bg {
+      background-image: none !important;
+    }
+  }
+
+  @media (max-width: 767px) {
+    [role="tablist"] {
+      justify-content: flex-start !important;
+      overflow-x: auto;
+      padding-bottom: 6px;
+    }
+    [role="tablist"]::-webkit-scrollbar {
+      display: none;
+    }
+    .tab-pill {
+      min-width: 240px !important;
+    }
+  }
+
+  /* ✅ ACTIVE pill bg */
+  .tab-pill.is-active .tab-fill {
+    width: 100%;
+    background: #ffffff;
+  }
+  .tab-pill.is-active .tab-label {
+    color: #0c0c0c;
+    font-weight: 600;
+  }
+
+  /* ✅ DEFAULT (inactive) */
+  .tab-pill .tab-label {
+    color: #ffffff;
+  }
+
+  /* ✅ CHECK COLORS (this is the main fix you asked) */
+  .tab-pill .tab-check {
+    color: #ffffff;      /* inactive tick color */
+  }
+
+  .tab-pill.is-active .tab-check {
+    color: #2ecc71;      /* active tick color */
+  }
+
+  .channel-pill {
+    box-shadow: 0 1px 0 rgba(0, 0, 0, 0.02);
+    transition: transform 160ms ease, box-shadow 160ms ease;
+  }
+  .channel-pill:hover,
+  .channel-pill:focus-visible {
+    transform: translateY(-1px);
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.08);
+    z-index: 999 !important;
+    outline: none;
+  }
+</style>
+
+<script is:inline type="module">
+  import "https://unpkg.com/@dotlottie/player-component@latest/dist/dotlottie-player.mjs";
+
+  const shell = document.querySelector("[data-hero]");
+  if (!shell) throw new Error("Hero: [data-hero] not found");
+
+  const mobileMax = Number(shell.dataset.mobileMax || "1023");
+
+  const bgs = JSON.parse(shell.dataset.bgs || "[]");
+  const lotties = JSON.parse(shell.dataset.lotties || "[]");
+  const mobileImages = JSON.parse(shell.dataset.mobileImages || "[]");
+  const rotateMs = Number(shell.dataset.rotateMs || "8000");
+  let active = Number(shell.dataset.defaultActive || "0");
+
+  const bgEl = shell.querySelector(".media-bg");
+  const tabButtons = Array.from(shell.querySelectorAll(".tab-pill"));
+  const lottieEls = Array.from(shell.querySelectorAll("[data-lottie]"));
+  const mobileImgEl = shell.querySelector(".mobile-media-img");
+
+  const players = new Map();
+  let timer = null;
+
+  function setBg(idx) {
+    if (!bgEl) return;
+    const src = bgs[idx] || bgs[0];
+    bgEl.style.backgroundImage = src ? `url(${src})` : "none";
+  }
+
+  function ensurePlayer(idx) {
+    const el = lottieEls.find((x) => Number(x.dataset.lottie) === idx);
+    const src = lotties[idx];
+    if (!el || !src) return null;
+
+    if (!players.has(idx)) {
+      el.innerHTML = "";
+
+      const p = document.createElement("dotlottie-player");
+      p.setAttribute("src", src);
+      p.setAttribute("background", "transparent");
+      p.setAttribute("speed", "1");
+      p.setAttribute("loop", "");
+      p.removeAttribute("autoplay");
+
+      p.style.width = "100%";
+      p.style.height = "100%";
+
+      const state = { player: p, ready: false, wantsPlay: false };
+      players.set(idx, state);
+
+      const markReadyAndMaybePlay = () => {
+        state.ready = true;
+        if (state.wantsPlay) {
+          state.wantsPlay = false;
+          try { p.stop?.(); } catch {}
+          try { p.play(); } catch {}
+        }
+      };
+
+      p.addEventListener("ready", markReadyAndMaybePlay, { once: true });
+      p.addEventListener("load", markReadyAndMaybePlay, { once: true });
+      p.addEventListener("loaded", markReadyAndMaybePlay, { once: true });
+
+      setTimeout(() => {
+        if (!state.ready) markReadyAndMaybePlay();
+      }, 600);
+
+      el.appendChild(p);
+    }
+
+    return players.get(idx)?.player || null;
+  }
+
+  function pauseAll() {
+    for (const s of players.values()) {
+      try { s.player.pause(); } catch {}
+    }
+  }
+
+  function requestPlay(idx) {
+    const s = players.get(idx);
+    if (!s) return;
+
+    if (!s.ready) {
+      s.wantsPlay = true;
+      return;
+    }
+
+    try { s.player.stop?.(); } catch {}
+    try { s.player.play(); } catch {}
+  }
+
+  function setActive(idx) {
+    active = idx;
+
+    tabButtons.forEach((b) => {
+      const i = Number(b.dataset.tab);
+      const on = i === idx;
+      b.classList.toggle("is-active", on);
+      b.setAttribute("aria-selected", on ? "true" : "false");
+    });
+
+    const isMobileLike = window.innerWidth <= mobileMax;
+
+    if (isMobileLike) {
+      if (mobileImgEl) mobileImgEl.src = mobileImages[idx] || mobileImages[0] || "";
+      pauseAll();
+      return;
+    }
+
+    setBg(idx);
+
+    lottieEls.forEach((el) => {
+      el.classList.toggle("is-active", Number(el.dataset.lottie) === idx);
+    });
+
+    ensurePlayer(idx);
+    pauseAll();
+    requestPlay(idx);
+  }
+
+  function startAuto() {
+    stopAuto();
+    timer = setInterval(() => setActive((active + 1) % tabButtons.length), rotateMs);
+  }
+
+  function stopAuto() {
+    if (timer) clearInterval(timer);
+    timer = null;
+  }
+
+  requestAnimationFrame(() => {
+    setActive(active);
+    startAuto();
+  });
+
+  shell.querySelector('[role="tablist"]')?.addEventListener("click", (e) => {
+    const btn = e.target.closest(".tab-pill");
+    if (!btn) return;
+    const idx = Number(btn.dataset.tab);
+    if (Number.isNaN(idx)) return;
+    setActive(idx);
+    startAuto();
+  });
+
+  shell.addEventListener("mouseenter", stopAuto);
+  shell.addEventListener("mouseleave", startAuto);
+
+  let r = null;
+  window.addEventListener("resize", () => {
+    clearTimeout(r);
+    r = setTimeout(() => setActive(active), 120);
+  });
+
+  const io = new IntersectionObserver(
+    (entries) => {
+      const on = entries.some((x) => x.isIntersecting);
+      if (!on) pauseAll();
+      else setActive(active);
+    },
+    { threshold: 0.2 },
+  );
+
+  io.observe(shell);
+</script>

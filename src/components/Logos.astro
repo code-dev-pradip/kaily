@@ -1,0 +1,178 @@
+---
+/**
+ * Logos.astro
+ * - Uses logos from /public/images/logo1.svg → logo25.svg
+ * - Random order at build time
+ * - 3 marquee rows: left, right, left
+ */
+
+const LOGO_COUNT = 25;
+
+let logos = Array.from({ length: LOGO_COUNT }, (_, i) => ({
+  src: `/images/logo${i + 1}.svg`,
+  alt: `logo ${i + 1}`,
+}));
+
+// Shuffle (Fisher–Yates)
+for (let i = logos.length - 1; i > 0; i--) {
+  const j = Math.floor(Math.random() * (i + 1));
+  [logos[i], logos[j]] = [logos[j], logos[i]];
+}
+---
+
+<section class="w-full py-8">
+  <div class="mx-auto max-w-[1200px] px-4 space-y-6">
+
+    <!-- Row 1 (LEFT) -->
+    <div class="overflow-hidden">
+      <div class="marquee-wrapper">
+        <div class="marquee logo-animate">
+          {logos.map((logo) => (
+            <div class="marquee__item">
+              <img
+                src={logo.src}
+                alt={logo.alt}
+                loading="lazy"
+                class="logo-img"
+              />
+            </div>
+          ))}
+          {logos.map((logo) => (
+            <div class="marquee__item">
+              <img
+                src={logo.src}
+                alt={logo.alt}
+                loading="lazy"
+                class="logo-img"
+              />
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+
+    <!-- Row 2 (RIGHT) -->
+    <div class="overflow-hidden">
+      <div class="marquee-wrapper">
+        <div class="marquee logo-animate-reverse">
+          {logos.map((logo) => (
+            <div class="marquee__item">
+              <img
+                src={logo.src}
+                alt={logo.alt}
+                loading="lazy"
+                class="logo-img"
+              />
+            </div>
+          ))}
+          {logos.map((logo) => (
+            <div class="marquee__item">
+              <img
+                src={logo.src}
+                alt={logo.alt}
+                loading="lazy"
+                class="logo-img"
+              />
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+
+    <!-- Row 3 (LEFT, slower) -->
+    <div class="overflow-hidden">
+      <div class="marquee-wrapper">
+        <div class="marquee logo-animate logo-animate-slow">
+          {logos.map((logo) => (
+            <div class="marquee__item">
+              <img
+                src={logo.src}
+                alt={logo.alt}
+                loading="lazy"
+                class="logo-img"
+              />
+            </div>
+          ))}
+          {logos.map((logo) => (
+            <div class="marquee__item">
+              <img
+                src={logo.src}
+                alt={logo.alt}
+                loading="lazy"
+                class="logo-img"
+              />
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<style>
+  .marquee-wrapper {
+    width: 100%;
+    overflow: hidden;
+  }
+
+  .marquee {
+    display: flex;
+    gap: 24px;
+    align-items: center;
+    white-space: nowrap;
+    width: max-content;
+    will-change: transform;
+  }
+
+  .marquee__item {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+    height: 82px;
+    width: 140px;          /* ✅ important: ensures SVG shows even if no intrinsic width */
+    padding: 12px 16px;
+    border-radius: 24px;
+    background: #fff;
+    border: 1px solid #ebebeb;
+  }
+
+  .logo-img {
+    display: block;
+    height: 44px;          /* logo height */
+    width: 110px;          /* ✅ important width */
+    object-fit: contain;
+  }
+
+  @keyframes will-changemarquee-horizontal {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+
+  @keyframes will-changemarquee-horizontal-reverse {
+    0% { transform: translateX(-50%); }
+    100% { transform: translateX(0); }
+  }
+
+  .logo-animate {
+    animation: will-changemarquee-horizontal 60s linear infinite;
+  }
+
+  .logo-animate-reverse {
+    animation: will-changemarquee-horizontal-reverse 60s linear infinite;
+  }
+
+  .logo-animate-slow {
+    animation-duration: 60s;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .logo-animate,
+    .logo-animate-reverse,
+    .logo-animate-slow {
+      animation: none;
+      transform: none;
+    }
+  }
+</style>

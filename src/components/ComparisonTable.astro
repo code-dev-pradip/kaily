@@ -1,0 +1,90 @@
+---
+/* Self-contained comparison table component */
+
+const rows = [
+  { left: "Responds to queries", right: "Completes tasks autonomously" },
+  { left: "Follows static scripts", right: "Adapts to context & user intent" },
+  { left: "Waits for instructions", right: "Takes initiative, offers next steps" },
+  { left: "Rule-based decision-making", right: "Combines logic + learning to execute smart actions" },
+  { left: "Works in silos", right: "Orchestrates across tools & platforms" },
+];
+---
+
+<div class="lg:w-5xl m-auto">
+  <div class="overflow-hidden rounded-[24px] border border-[#EBEBEB] bg-white">
+
+    <!-- Header -->
+    <div class="grid grid-cols-2 divide-x divide-[#EBEBEB]">
+      <div
+        class="bg-[#fafafa] px-4 py-3 lg:px-8 lg:py-5 text-center text-[18px] font-semibold text-[#0c0c0c]
+               md:px-10 md:py-6 md:text-[22px]"
+      >
+        Traditional chatbot
+      </div>
+
+      <div
+        class="bg-[#cc99ff26] px-4 py-3 lg:px-8 lg:py-5 text-center text-[18px] font-semibold text-[#7f00ff]
+               md:px-10 md:py-6 md:text-[22px]"
+      >
+        Kaily
+      </div>
+    </div>
+
+    <!-- Rows -->
+    <div class="divide-y divide-[#EBEBEB]">
+      {rows.map((row) => (
+        <div class="grid grid-cols-2 divide-x divide-[#EBEBEB]">
+          <!-- Left column -->
+          <div
+            class="px-4 py-3 lg:px-8 lg:py-5 text-left font-medium text-[16px] leading-[1.6] text-[#4b4b4b]
+                   md:px-10 md:text-[16px]"
+          >
+            {row.left}
+          </div>
+
+          <!-- Right column -->
+          <div class="px-4 py-3 lg:px-8 lg:py-5 md:px-10">
+            <div
+              class="flex items-start gap-3 font-medium text-left text-[16px] leading-[1.6]
+                     text-[#4b4b4b] md:text-[16px]"
+            >
+              <img
+                src="/images/sparkle.svg"
+                alt=""
+                class="mt-[2px] h-5 w-5 shrink-0"
+                loading="lazy"
+              />
+              <span>{row.right}</span>
+            </div>
+          </div>
+        </div>
+      ))}
+
+      <!-- Final highlighted row -->
+      <div class="grid grid-cols-2 divide-x divide-[#EBEBEB]">
+        <div
+          class="px-4 py-3 lg:px-8 lg:py-5 text-left text-[16px] font-medium leading-[1.6] text-[#E11D48]
+                 md:px-10 md:text-[18px]"
+        >
+          Feels like a tool
+        </div>
+
+        <div class="px-4 py-3 lg:px-8 lg:py-5 md:px-10">
+          <div
+            class="flex items-start gap-3 text-left text-[16px] font-medium leading-[1.6]
+                   text-[#6D28FF] md:text-[18px]"
+          >
+            <img
+              src="/images/sparkle.svg"
+              alt=""
+              class="mt-[2px] h-5 w-5 shrink-0"
+              loading="lazy"
+            />
+            <span>Feels like a team member</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>

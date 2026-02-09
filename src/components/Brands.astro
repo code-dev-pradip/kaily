@@ -1,0 +1,182 @@
+---
+/**
+ * Brands.astro
+ * - Desktop: 2 static single rows (no wrapping)
+ * - Mobile/Tablet: infinite marquee
+ * - Each logo has its own width & height
+ */
+
+const defaultRow1 = [
+  { src: "/images/ajio.svg", alt: "AJIO", h: 34, w: 72 },
+  { src: "/images/samsonite.svg", alt: "Samsonite", h: 32, w: 120 },
+  { src: "/images/Hathway.svg", alt: "Hathway", h: 30, w: 110 },
+  { src: "/images/toys.svg", alt: "Toys R Us", h: 34, w: 90 },
+  { src: "/images/Guess.svg", alt: "Guess", h: 36, w: 80 },
+  { src: "/images/Netmeds.svg", alt: "Netmeds", h: 32, w: 120 },
+  { src: "/images/wonderfly.svg", alt: "Wonderfly", h: 34, w: 110 },
+];
+
+const defaultRow2 = [
+  { src: "/images/alabama.svg", alt: "University of Alabama", h: 34, w: 220 },
+  { src: "/images/conmed.svg", alt: "ConMed", h: 32, w: 120 },
+  { src: "/images/sti.png", alt: "STIHL", h: 36, w: 90 },
+  { src: "/images/muriya.svg", alt: "Muriya", h: 34, w: 110 },
+  { src: "/images/luxurycloset.svg", alt: "Luxury Closet", h: 34, w: 190 },
+  { src: "/images/justdogs.svg", alt: "Justdogs", h: 32, w: 110 },
+];
+
+const {
+  title = "Trusted by 100+ global brands",
+  row1 = defaultRow1,
+  row2 = defaultRow2,
+} = Astro.props;
+
+const row1Loop = [...row1, ...row1];
+const row2Loop = [...row2, ...row2];
+---
+
+<section class="w-full py-10 md:py-14">
+  <div class="mx-auto max-w-310 px-4">
+    <p
+      class="text-center text-[18px] font-medium text-[#4c4c4c] md:text-[22px]"
+    >
+      {title}
+    </p>
+
+    <!-- ================= DESKTOP ================= -->
+    <div class="mt-10 hidden lg:block md:hidden">
+      <div class="flex items-center justify-center gap-x-8">
+        {
+          row1.map((b) => {
+            return (
+              <img
+                src={b.src}
+                alt={b.alt}
+                loading="lazy"
+                style={`height:${b.h}px; width:${b.w}px;`}
+                class="object-contain opacity-95"
+              />
+            );
+          })
+        }
+      </div>
+
+      <div class="mt-12 flex items-center justify-center gap-x-8">
+        {
+          row2.map((b) => {
+            return (
+              <img
+                src={b.src}
+                alt={b.alt}
+                loading="lazy"
+                style={`height:${b.h}px; width:${b.w}px;`}
+                class="object-contain opacity-95"
+              />
+            );
+          })
+        }
+      </div>
+    </div>
+
+    <!-- ================= MOBILE / TABLET ================= -->
+    <div class="mt-8 lg:hidden md:block">
+      <!-- Row 1: LEFT -->
+      <div class="marquee-outer">
+        <div class="marquee-track marquee-left">
+          {
+            row1Loop.map((b) => {
+              return (
+                <div class="marquee-item">
+                  <img
+                    src={b.src}
+                    alt={b.alt}
+                    loading="lazy"
+                    style={`height:${b.h}px; width:${b.w}px;`}
+                    class="object-contain opacity-95"
+                  />
+                </div>
+              );
+            })
+          }
+        </div>
+      </div>
+
+      <!-- Row 2: RIGHT -->
+      <div class="marquee-outer mt-6">
+        <div class="marquee-track marquee-right">
+          {
+            row2Loop.map((b) => {
+              return (
+                <div class="marquee-item">
+                  <img
+                    src={b.src}
+                    alt={b.alt}
+                    loading="lazy"
+                    style={`height:${b.h}px; width:${b.w}px;`}
+                    class="object-contain opacity-95"
+                  />
+                </div>
+              );
+            })
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .marquee-outer {
+    overflow: hidden;
+    width: 100%;
+  }
+
+  .marquee-track {
+    display: flex;
+    align-items: center;
+    gap: 44px;
+    width: max-content;
+    will-change: transform;
+  }
+
+  .marquee-item {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    white-space: nowrap;
+  }
+
+  @keyframes brands-left {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(-50%);
+    }
+  }
+
+  @keyframes brands-right {
+    from {
+      transform: translateX(-50%);
+    }
+    to {
+      transform: translateX(0);
+    }
+  }
+
+  .marquee-left {
+    animation: brands-left 20s linear infinite;
+  }
+
+  .marquee-right {
+    animation: brands-right 22s linear infinite;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .marquee-left,
+    .marquee-right {
+      animation: none;
+      transform: none;
+    }
+  }
+</style>
