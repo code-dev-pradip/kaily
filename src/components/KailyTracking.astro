@@ -1,0 +1,541 @@
+---
+/**
+ * Global lazy PostHog + Kaily tracking
+ * - PostHog loads after window load + requestIdleCallback (PageSpeed friendly)
+ * - Kaily tracking starts on first user interaction
+ * - Both are guarded to avoid double init across pages
+ */
+---
+
+<script is:inline type="module">
+  /* ------------------------------------------------------------------ */
+  /* 1) PostHog lazy init (from your snippet)                            */
+  /* ------------------------------------------------------------------ */
+
+  if (!window.__KAILY_POSTHOG_BOOTSTRAPPED__) {
+    window.__KAILY_POSTHOG_BOOTSTRAPPED__ = true;
+
+    (function () {
+      // ---- CONFIG ----
+      var PH_KEY = "phc_oY1wjdhR6JUvLFXYBwbbiY6jqxqPzwxSl1z8Mm5mPux";
+      var PH_API_HOST = "https://us.i.posthog.com";
+      var PH_DEFAULTS = "2025-05-24";
+
+      // ---- LOAD STRATEGY ----
+      function runWhenReady(fn) {
+        function start() {
+          if ("requestIdleCallback" in window) {
+            requestIdleCallback(fn, { timeout: 3000 });
+          } else {
+            setTimeout(fn, 1500);
+          }
+        }
+        if (document.readyState === "complete") start();
+        else window.addEventListener("load", start, { once: true });
+      }
+
+      function initPosthog() {
+        // Prevent double init
+        if (window.posthog && window.posthog.__loaded) return;
+
+        // PostHog snippet (core)
+        (function (t, e) {
+          var o, n, p, r;
+          (e.__SV ||
+            (window.posthog && window.posthog.__loaded) ||
+            (window.posthog = e),
+            (e._i = []),
+            (e.init = function (i, s, a) {
+              function g(t, e) {
+                var o = e.split(".");
+                2 == o.length && ((t = t[o[0]]), (e = o[1]));
+                t[e] = function () {
+                  t.push([e].concat(Array.prototype.slice.call(arguments, 0)));
+                };
+              }
+              (p = t.createElement("script")).type = "text/javascript";
+              p.crossOrigin = "anonymous";
+              p.async = !0;
+              p.src =
+                s.api_host.replace(".i.posthog.com", "-assets.i.posthog.com") +
+                "/static/array.js";
+
+              (r = t.getElementsByTagName("script")[0]).parentNode.insertBefore(
+                p,
+                r,
+              );
+
+              var u = e;
+              for (
+                void 0 !== a ? (u = e[a] = []) : (a = "posthog"),
+                  u.people = u.people || [],
+                  u.toString = function (t) {
+                    var e = "posthog";
+                    return (
+                      "posthog" !== a && (e += "." + a),
+                      t || (e += " (stub)"),
+                      e
+                    );
+                  },
+                  u.people.toString = function () {
+                    return u.toString(1) + ".people (stub)";
+                  },
+                  o =
+                    "init capture register register_once register_for_session unregister unregister_for_session getFeatureFlag getFeatureFlagPayload isFeatureEnabled reloadFeatureFlags on onFeatureFlags identify group reset get_distinct_id get_session_id alias set_config startSessionRecording stopSessionRecording captureException debug".split(
+                      " ",
+                    ),
+                  n = 0;
+                n < o.length;
+                n++
+              )
+                g(u, o[n]);
+
+              e._i.push([i, s, a]);
+            }),
+            (e.__SV = 1));
+        })(document, window.posthog || []);
+
+        // Init config
+        window.posthog.init(PH_KEY, {
+          api_host: PH_API_HOST,
+          defaults: PH_DEFAULTS,
+          person_profiles: "identified_only",
+          loaded: function () {
+            // Marker that it’s really ready
+            window.__KAILY_POSTHOG_READY__ = true;
+          },
+        });
+      }
+
+      runWhenReady(initPosthog);
+    })();
+  }
+
+  /* ------------------------------------------------------------------ */
+  /* 2) Your Kaily tracking script (starts on first interaction)         */
+  /* ------------------------------------------------------------------ */
+
+  if (!window.__KAILY_TRACKING_BOOTSTRAPPED__) {
+    window.__KAILY_TRACKING_BOOTSTRAPPED__ = true;
+
+    (function () {
+      var started = false;
+
+      function startKailyTracking() {
+        if (started || window.__KAILY_TRACKING_STARTED__) return;
+        started = true;
+        window.__KAILY_TRACKING_STARTED__ = true;
+
+        (function () {
+          // ---------- CONFIG ----------
+          const EVENT_PREFIX = "kaily_website";
+          const PRODUCT_NAME = "kaily.ai website";
+
+          // ---------- STORAGE KEYS ----------
+          const SS = window.sessionStorage;
+          const SESSION_KEY = "kaily.session";
+          const PAGES_KEY = "kaily.pages";
+          const ACCUM_MS_KEY = "kaily.accum_ms";
+          const TOUCHPOINTS_KEY = "kaily.touchpoints";
+          const FIRST_PAGE_KEY = "kaily.first_page";
+          const ENTRY_TIME_KEY = "kaily.entry_time_iso";
+          const ORIGIN_KEY = "kaily.origin";
+          const UTM_KEYS = {
+            source: "kaily.utm_source",
+            medium: "kaily.utm_medium",
+            campaign: "kaily.utm_campaign",
+            content: "kaily.utm_content",
+            term: "kaily.utm_term",
+          };
+
+          // ---------- UTILS ----------
+          function now() {
+            return Date.now();
+          }
+          function iso(ts) {
+            return new Date(ts).toISOString();
+          }
+          function toInt(x, fb = 0) {
+            const n = parseInt(x, 10);
+            return Number.isFinite(n) ? n : fb;
+          }
+          function getJSON(key, fb) {
+            try {
+              return JSON.parse(SS.getItem(key) || "");
+            } catch {
+              return fb;
+            }
+          }
+          function setJSON(key, v) {
+            SS.setItem(key, JSON.stringify(v));
+          }
+          function seg(s) {
+            return String(s || "")
+              .trim()
+              .toLowerCase()
+              .replace(/[^\w]+/g, "_")
+              .replace(/^_+|_+$/g, "");
+          }
+          function normalizePath(path) {
+            return String(path || "")
+              .split(".")
+              .map(seg)
+              .filter(Boolean)
+              .join(".");
+          }
+          function buildEventName({ section, actionPath, verb }) {
+            const parts = [EVENT_PREFIX];
+            if (section) parts.push(seg(section));
+            if (actionPath) parts.push(normalizePath(actionPath));
+            parts.push(seg(verb || "clicked"));
+            return parts.join(".");
+          }
+
+          // ---------- ORIGIN / CONTEXT ----------
+          function detectBrowser() {
+            const ua = navigator.userAgent || "";
+            if (/edg/i.test(ua)) return "Edge";
+            if (/chrome|crios/i.test(ua) && !/edg/i.test(ua)) return "Chrome";
+            if (/safari/i.test(ua) && !/chrome|crios|android/i.test(ua))
+              return "Safari";
+            if (/firefox|fxios/i.test(ua)) return "Firefox";
+            if (/opera|opr/i.test(ua)) return "Opera";
+            return "Other";
+          }
+          function detectDevice() {
+            const ua = navigator.userAgent || "";
+            if (
+              /iPad/.test(ua) ||
+              (/Android/.test(ua) && !/Mobile/.test(ua)) ||
+              /Tablet/.test(ua)
+            )
+              return "Tablet";
+            if (
+              /Mobile|iPhone|Android|BlackBerry|Opera Mini|IEMobile|WPDesktop/.test(
+                ua,
+              )
+            )
+              return "Mobile";
+            if (/Windows NT/.test(ua)) return "Windows 10/11 PC";
+            if (/Macintosh/.test(ua)) return "Mac";
+            if (/Linux/.test(ua)) return "Linux";
+            return "Desktop";
+          }
+          function computeOrigin() {
+            const search = new URLSearchParams(window.location.search);
+            const utm = search.get("utm_source");
+            if (utm) return utm;
+            try {
+              if (document.referrer) return new URL(document.referrer).hostname;
+            } catch {}
+            return "";
+          }
+
+          // ---------- UTM HELPERS ----------
+          function readUTMsFromURL() {
+            const s = new URLSearchParams(window.location.search);
+            return {
+              source: s.get("utm_source") || "",
+              medium: s.get("utm_medium") || "",
+              campaign: s.get("utm_campaign") || "",
+              content: s.get("utm_content") || "",
+              term: s.get("utm_term") || "",
+            };
+          }
+          function storeFirstTouchUTMsIfPresent() {
+            const u = readUTMsFromURL();
+            const hasAny =
+              u.source || u.medium || u.campaign || u.content || u.term;
+            if (!hasAny) return;
+
+            if (!SS.getItem(UTM_KEYS.source) && u.source)
+              SS.setItem(UTM_KEYS.source, u.source);
+            if (!SS.getItem(UTM_KEYS.medium) && u.medium)
+              SS.setItem(UTM_KEYS.medium, u.medium);
+            if (!SS.getItem(UTM_KEYS.campaign) && u.campaign)
+              SS.setItem(UTM_KEYS.campaign, u.campaign);
+            if (!SS.getItem(UTM_KEYS.content) && u.content)
+              SS.setItem(UTM_KEYS.content, u.content);
+            if (!SS.getItem(UTM_KEYS.term) && u.term)
+              SS.setItem(UTM_KEYS.term, u.term);
+          }
+          function getStoredUTMs() {
+            return {
+              source: SS.getItem(UTM_KEYS.source) || "",
+              medium: SS.getItem(UTM_KEYS.medium) || "",
+              campaign: SS.getItem(UTM_KEYS.campaign) || "",
+              content: SS.getItem(UTM_KEYS.content) || "",
+              term: SS.getItem(UTM_KEYS.term) || "",
+            };
+          }
+          function buildUTMProps() {
+            const utm = getStoredUTMs();
+            const p = {};
+            if (utm.source) {
+              p["utm_source"] = utm.source;
+              p["kaily_website.utm_source"] = utm.source;
+            }
+            if (utm.medium) {
+              p["utm_medium"] = utm.medium;
+              p["kaily_website.utm_medium"] = utm.medium;
+            }
+            if (utm.campaign) {
+              p["utm_campaign"] = utm.campaign;
+              p["kaily_website.utm_campaign"] = utm.campaign;
+            }
+            if (utm.content) {
+              p["utm_content"] = utm.content;
+              p["kaily_website.utm_content"] = utm.content;
+            }
+            if (utm.term) {
+              p["utm_term"] = utm.term;
+              p["kaily_website.utm_term"] = utm.term;
+            }
+            return p;
+          }
+
+          // ---------- SESSION BOOTSTRAP ----------
+          let session = getJSON(SESSION_KEY, null);
+          if (!session || !session.id) {
+            session = { id: String(Math.random()).slice(2), started_at: now() };
+            SS.setItem(SESSION_KEY, JSON.stringify(session));
+            SS.setItem(PAGES_KEY, "0");
+            SS.setItem(ACCUM_MS_KEY, "0");
+            setJSON(TOUCHPOINTS_KEY, []);
+            SS.setItem(FIRST_PAGE_KEY, window.location.pathname);
+            SS.setItem(ENTRY_TIME_KEY, iso(session.started_at));
+            SS.setItem(ORIGIN_KEY, computeOrigin());
+            storeFirstTouchUTMsIfPresent();
+          } else {
+            storeFirstTouchUTMsIfPresent();
+          }
+
+          SS.setItem(PAGES_KEY, String(toInt(SS.getItem(PAGES_KEY)) + 1));
+
+          // timing (visible time only)
+          let pageEnterTs = now();
+          function addVisibleTime() {
+            if (document.visibilityState === "visible") {
+              const elapsed = now() - pageEnterTs;
+              SS.setItem(
+                ACCUM_MS_KEY,
+                String(
+                  toInt(SS.getItem(ACCUM_MS_KEY)) + Math.max(0, elapsed | 0),
+                ),
+              );
+              pageEnterTs = now();
+            }
+          }
+          document.addEventListener("visibilitychange", () => {
+            if (document.visibilityState === "hidden") addVisibleTime();
+            else pageEnterTs = now();
+          });
+
+          // ---------- COMMON PROPS ----------
+          function baseProps(extra = {}) {
+            const durationMs = toInt(SS.getItem(ACCUM_MS_KEY));
+            const tps = getJSON(TOUCHPOINTS_KEY, []);
+            return {
+              "kaily_website.journey_session_duration": durationMs,
+              "kaily_website.journey_session_duration_seconds": Math.round(
+                durationMs / 1000,
+              ),
+              "kaily_website.journey_total_pages": toInt(SS.getItem(PAGES_KEY)),
+              "kaily_website.journey_touchpoints": JSON.stringify(tps),
+              "kaily_website.journey_touchpoints_count": tps.length,
+              "kaily_website.journey_first_page":
+                SS.getItem(FIRST_PAGE_KEY) || "/",
+              "kaily_website.journey_current_page": window.location.pathname,
+              "kaily_website.journey_entry_time":
+                SS.getItem(ENTRY_TIME_KEY) || iso(session.started_at),
+              "kaily_website.journey_origin": SS.getItem(ORIGIN_KEY) || "",
+              "kaily_website.journey_device": detectDevice(),
+              "kaily_website.journey_browser": detectBrowser(),
+              "kaily_website.product": PRODUCT_NAME,
+              "kaily_website.source_page": window.location.pathname,
+              "kaily_website.referrer": document.referrer || "",
+              ...buildUTMProps(),
+              ...extra,
+            };
+          }
+
+          // ✅ If PostHog isn't ready yet, retry a few times (non-blocking)
+          function phCapture(name, props, tries = 0) {
+            try {
+              if (
+                window.posthog &&
+                typeof window.posthog.capture === "function"
+              ) {
+                window.posthog.capture(name, props);
+              } else if (tries < 10) {
+                setTimeout(() => phCapture(name, props, tries + 1), 250);
+              }
+            } catch {}
+          }
+
+          // PAGE LOADED
+          phCapture(`${EVENT_PREFIX}.page.loaded`, baseProps());
+
+          // HEARTBEAT
+          let hb = setInterval(function () {
+            if (document.visibilityState !== "visible") return;
+            addVisibleTime();
+            phCapture(`${EVENT_PREFIX}.journey.updated`, baseProps());
+          }, 15000);
+
+          function sendFinal() {
+            addVisibleTime();
+            phCapture(
+              `${EVENT_PREFIX}.journey.ended`,
+              baseProps({ "kaily_website.journey_exit_time": iso(now()) }),
+            );
+          }
+          window.addEventListener("pagehide", sendFinal);
+          window.addEventListener("beforeunload", sendFinal);
+          window.addEventListener("unload", () => clearInterval(hb));
+
+          // TOUCHPOINTS
+          function getPhMeta(el) {
+            let section = el.getAttribute("data-ph-section");
+            let actionPath = el.getAttribute("data-ph-action");
+            if ((!section || !actionPath) && el.hasAttribute("data-ph")) {
+              const parts = (el.getAttribute("data-ph") || "")
+                .split(/\s+/)
+                .filter(Boolean);
+              if (parts.length >= 2) {
+                section = section || parts[0];
+                actionPath = actionPath || parts[parts.length - 1];
+              } else if (parts.length === 1) {
+                actionPath = actionPath || parts[0];
+              }
+            }
+            section = seg(section || "");
+            actionPath = normalizePath(actionPath || "");
+            return { section, actionPath };
+          }
+
+          function recordTouchpoint(tp) {
+            const arr = getJSON(TOUCHPOINTS_KEY, []);
+            if (arr.length > 300) arr.shift();
+            arr.push(tp);
+            setJSON(TOUCHPOINTS_KEY, arr);
+          }
+
+          let lastActivation = { ts: 0, el: null };
+          function shouldDedupe(el) {
+            const t = now();
+            const dup = lastActivation.el === el && t - lastActivation.ts < 300;
+            lastActivation = { ts: t, el };
+            return dup;
+          }
+
+          function handleActivation(el, trigger) {
+            const { section, actionPath } = getPhMeta(el);
+            if (!section && !actionPath) return;
+
+            const dynamicProp = (el.getAttribute("data-property") || "").trim();
+            const sectionProp = (
+              el.getAttribute("data-property-section") || ""
+            ).trim();
+
+            if (shouldDedupe(el)) return;
+
+            const eventName = buildEventName({
+              section: section || null,
+              actionPath: actionPath || null,
+              verb: "clicked",
+            });
+            const text = (el.innerText || el.textContent || "").trim();
+
+            const payload = {
+              "kaily_website.ph_section": section || null,
+              "kaily_website.ph_action": actionPath || null,
+              "kaily_website.cta_text": text,
+              "kaily_website.cta_id": el.id || "",
+              "kaily_website.cta_tag": el.tagName,
+              "kaily_website.cta_href": el.getAttribute("href") || "",
+              "kaily_website.cta_trigger": trigger,
+              ...(dynamicProp
+                ? { "kaily_website.button_click": dynamicProp }
+                : {}),
+              ...(sectionProp ? { "kaily_website.section": sectionProp } : {}),
+            };
+
+            recordTouchpoint({
+              ts: Date.now(),
+              path: window.location.pathname,
+              section,
+              action: actionPath,
+              trigger,
+              text,
+              id: el.id || "",
+              tag: el.tagName,
+              href: el.getAttribute("href") || "",
+            });
+
+            phCapture(eventName, baseProps(payload));
+          }
+
+          document.addEventListener("click", function (e) {
+            const el =
+              e.target &&
+              e.target.closest(
+                "[data-ph-action], [data-ph], [data-ph-section]",
+              );
+            if (el) handleActivation(el, "click");
+          });
+
+          document.addEventListener("keydown", function (e) {
+            if (e.key !== "Enter" && e.key !== " ") return;
+            const el = document.activeElement;
+            if (
+              !el ||
+              !(
+                el.matches &&
+                (el.matches("[data-ph-action]") ||
+                  el.matches("[data-ph], [data-ph-section]"))
+              )
+            )
+              return;
+            e.preventDefault();
+            handleActivation(el, "keyboard");
+          });
+
+          window.kailyNoteVirtualPage = function () {
+            SS.setItem(PAGES_KEY, String(toInt(SS.getItem(PAGES_KEY)) + 1));
+            phCapture(`${EVENT_PREFIX}.page.virtual_loaded`, baseProps());
+          };
+        })();
+
+        // Cleanup listeners
+        window.removeEventListener("scroll", startKailyTracking);
+        window.removeEventListener("click", startKailyTracking);
+        window.removeEventListener("touchstart", startKailyTracking);
+        window.removeEventListener("mousemove", startKailyTracking);
+        window.removeEventListener("keydown", startKailyTracking);
+      }
+
+      // Start on first interaction
+      window.addEventListener("scroll", startKailyTracking, {
+        once: true,
+        passive: true,
+      });
+      window.addEventListener("click", startKailyTracking, { once: true });
+      window.addEventListener("touchstart", startKailyTracking, {
+        once: true,
+        passive: true,
+      });
+      window.addEventListener("mousemove", startKailyTracking, { once: true });
+      window.addEventListener("keydown", startKailyTracking, { once: true });
+    })();
+  }
+
+  /* ------------------------------------------------------------------ */
+  /* 3) Optional: SPA / View Transitions                                 */
+  /* ------------------------------------------------------------------ */
+  document.addEventListener("astro:after-swap", () => {
+    if (typeof window.kailyNoteVirtualPage === "function") {
+      window.kailyNoteVirtualPage();
+    }
+  });
+</script>
